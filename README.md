@@ -1,13 +1,12 @@
-# Databricks for AdTech Repo 
+# 📖 Databricks for AdTech Repo 
 
-```
 Welcome to the Databricks for AdTech Solutions repository — a curated collection of common AdTech solutions, technical content, and other tools to get started with rapid development on Databricks.  
 
 ## What You'll Find in the AdTech Repo
 
-*
-*
-*
+-
+-
+-
 
 ## Installation
 
