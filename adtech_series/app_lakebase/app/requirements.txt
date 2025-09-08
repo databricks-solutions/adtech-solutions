@@ -1,0 +1,10 @@
+streamlit==1.38.0
+debugpy==1.8.15
+sqlalchemy==2.0.30
+alembic==1.13.1
+databricks-sdk==0.58.0
+databricks-sdk[openai]
+psycopg2-binary==2.9.9
+pgvector==0.2.5
+dash==2.18.1
+dash-bootstrap-components==1.6.0

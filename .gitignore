@@ -3,3 +3,10 @@
 __pycache__
 .idea/
 .env
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+*.tfplan

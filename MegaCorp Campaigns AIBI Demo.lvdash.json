@@ -1,0 +1,814 @@
+{
+  "datasets": [
+    {
+      "name": "15f3fa49",
+      "displayName": "Total Individuals",
+      "queryLines": [
+        "select count(distinct megacorp_indid) as num_inds\n",
+        "from achu_demos.segments.megacorp_campaigns\n",
+        "where campaign_name = :Campaign\n",
+        "limit 10\n",
+        "\n",
+        "-- achu_demos_data_collab.profiles.partner1_audience_census_profile"
+      ],
+      "parameters": [
+        {
+          "displayName": "Campaign",
+          "keyword": "Campaign",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "Happy Dogs"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "0d627cae",
+      "displayName": "Campaign Age Range",
+      "queryLines": [
+        "with current_campaign as (\n",
+        "select *\n",
+        "from achu_demos.segments.megacorp_campaigns\n",
+        "--where campaign_name =  :Campaign\n",
+        ")\n",
+        "select coalesce(CASE\n",
+        "           WHEN age >= 18 AND age <= 24 THEN '18-24'\n",
+        "           WHEN age >= 25 AND age <= 34 THEN '25-34'\n",
+        "           WHEN age >= 35 AND age <= 44 THEN '35-44'\n",
+        "           WHEN age >= 45 AND age <= 55 THEN '45-55'\n",
+        "           WHEN age > 55 THEN '55+'\n",
+        "       END , 'Unknown') as age_range, count(distinct a.megacorp_indid) as num_individuals, campaign_name AS Segment\n",
+        "from current_campaign a join achu_demos.profiles.megacorp_audience_census_profile b on a.megacorp_indid = b.megacorp_indid\n",
+        "group by campaign_name, age_range\n",
+        "order by age_range\n",
+        "-- limit 10"
+      ]
+    },
+    {
+      "name": "e13a8338",
+      "displayName": "Campaign Gender Breakdown",
+      "queryLines": [
+        "with current_campaign as (\n",
+        "select *\n",
+        "from achu_demos.segments.megacorp_campaigns\n",
+        "--where campaign_name =  :Campaign\n",
+        ")\n",
+        "select coalesce(gender, 'Unknown') as gender, count(distinct a.megacorp_indid) as num_individuals, campaign_name AS Segment\n",
+        "from current_campaign a join achu_demos.profiles.megacorp_audience_census_profile b on a.megacorp_indid = b.megacorp_indid\n",
+        "group by campaign_name, gender\n",
+        "order by gender\n",
+        "-- limit 10"
+      ]
+    },
+    {
+      "name": "d9335995",
+      "displayName": "Match Funnel",
+      "queryLines": [
+        "with campaign_inds as (\n",
+        "  select distinct megacorp_indid\n",
+        "  from achu_demos.segments.megacorp_campaigns\n",
+        "  where campaign_name = :Campaign\n",
+        "),\n",
+        "email_indids as (\n",
+        "  select distinct email_sha256\n",
+        "  from achu_demos.crosswalks.megacorp_audience_digital_graph a\n",
+        "  join campaign_inds b\n",
+        "  on a.megacorp_indid = b.megacorp_indid\n",
+        "),\n",
+        "match_rate as (\n",
+        "  select market_share\n",
+        "  from achu_demos.bronze.synthetic_distributor_metrics\n",
+        "  where distributor_name = :Distributor\n",
+        "),\n",
+        "num_ids as (\n",
+        "  select count(*) as n\n",
+        "  from campaign_inds\n",
+        "),\n",
+        "num_emails as (\n",
+        "  select count(*) as n\n",
+        "  from email_indids\n",
+        "),\n",
+        "total_mc_ids as (\n",
+        "  select count(distinct megacorp_indid) as n\n",
+        "  from achu_demos.crosswalks.megacorp_audience_digital_graph\n",
+        "),\n",
+        "total_mc_emails as (\n",
+        "  select count(distinct email_sha256) as n\n",
+        "  from achu_demos.crosswalks.megacorp_audience_digital_graph\n",
+        ")\n",
+        "\n",
+        "SELECT 'Individuals in Segment' AS match_funnel_step, n AS num_ids, ROUND(n/(select n from total_mc_ids),4) as pct_universe\n",
+        "FROM num_ids\n",
+        "UNION ALL\n",
+        "SELECT 'Matched Emails from MegaCorp Universe', n AS num_ids, ROUND(n/(select n from total_mc_emails),4)\n",
+        "FROM num_emails\n",
+        "UNION ALL\n",
+        "SELECT 'Matched Emails to Partner Universe', ROUND(n * (select market_share from match_rate)) AS num_ids, ROUND(n/(select n from total_mc_emails),4) AS pct_universe\n",
+        "FROM num_emails"
+      ],
+      "parameters": [
+        {
+          "displayName": "Campaign",
+          "keyword": "Campaign",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "Happy Dogs"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "Distributor",
+          "keyword": "Distributor",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "Rainbow Hemisphere"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "643237b7",
+      "displayName": "Segment Names",
+      "queryLines": [
+        "SELECT DISTINCT segment_name, segment_definition\n",
+        "FROM achu_demos.segments.megacorp_segment_definitions\n",
+        "ORDER BY segment_name"
+      ]
+    },
+    {
+      "name": "34e035c2",
+      "displayName": "Distributor Names",
+      "queryLines": [
+        "select distinct distributor_name \n",
+        "from achu_demos.bronze.synthetic_distributor_metrics"
+      ]
+    },
+    {
+      "name": "afbb3bc5",
+      "displayName": "Segment Details",
+      "queryLines": [
+        "SELECT * FROM achu_demos.segments.megacorp_campaigns"
+      ]
+    },
+    {
+      "name": "8d534591",
+      "displayName": "megacorp_audience_census_profile",
+      "queryLines": [
+        "SELECT * \n",
+        "FROM achu_demos.profiles.megacorp_audience_census_profile"
+      ]
+    },
+    {
+      "name": "7c939bdc",
+      "displayName": "Location",
+      "queryLines": [
+        "SELECT * from megan_fogal.bronze.audience_location"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "7dc53886",
+      "displayName": "Campaign Segment Ingestion Report",
+      "layout": [
+        {
+          "widget": {
+            "name": "f829a049",
+            "queries": [
+              {
+                "name": "dashboards/01f072fd333618bcab36a77b0bb921ab/datasets/01f072fd33361e2c9ba77a726c4f3d6f_segment_name",
+                "query": {
+                  "datasetName": "643237b7",
+                  "fields": [
+                    {
+                      "name": "segment_name",
+                      "expression": "`segment_name`"
+                    },
+                    {
+                      "name": "segment_name_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "dashboards/01f072fd333618bcab36a77b0bb921ab/datasets/01f072fd33361e03a4506e245469a604_Segment",
+                "query": {
+                  "datasetName": "0d627cae",
+                  "fields": [
+                    {
+                      "name": "Segment",
+                      "expression": "`Segment`"
+                    },
+                    {
+                      "name": "Segment_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "dashboards/01f072fd333618bcab36a77b0bb921ab/datasets/01f072fd33361e1494660bc76bd13bda_Segment",
+                "query": {
+                  "datasetName": "e13a8338",
+                  "fields": [
+                    {
+                      "name": "Segment",
+                      "expression": "`Segment`"
+                    },
+                    {
+                      "name": "Segment_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_dashboards/01f072fd333618bcab36a77b0bb921ab/datasets/01f072fd33361db1a9dc56aef028d3bc_Campaign",
+                "query": {
+                  "datasetName": "15f3fa49",
+                  "parameters": [
+                    {
+                      "name": "Campaign",
+                      "keyword": "Campaign"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "parameterName": "Campaign",
+                    "queryName": "parameter_dashboards/01f072fd333618bcab36a77b0bb921ab/datasets/01f072fd33361db1a9dc56aef028d3bc_Campaign"
+                  },
+                  {
+                    "fieldName": "segment_name",
+                    "displayName": "segment_name",
+                    "queryName": "dashboards/01f072fd333618bcab36a77b0bb921ab/datasets/01f072fd33361e2c9ba77a726c4f3d6f_segment_name"
+                  },
+                  {
+                    "fieldName": "Segment",
+                    "displayName": "Segment",
+                    "queryName": "dashboards/01f072fd333618bcab36a77b0bb921ab/datasets/01f072fd33361e03a4506e245469a604_Segment"
+                  },
+                  {
+                    "fieldName": "Segment",
+                    "displayName": "Segment",
+                    "queryName": "dashboards/01f072fd333618bcab36a77b0bb921ab/datasets/01f072fd33361e1494660bc76bd13bda_Segment"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Segment Name"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 2,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "4ddc9d8d",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d9335995",
+                  "fields": [
+                    {
+                      "name": "match_funnel_step",
+                      "expression": "`match_funnel_step`"
+                    },
+                    {
+                      "name": "num_ids",
+                      "expression": "`num_ids`"
+                    },
+                    {
+                      "name": "pct_universe",
+                      "expression": "`pct_universe`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "match_funnel_step",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 100000,
+                    "title": "Matching Step",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "description": "notes!",
+                    "displayName": "match_funnel_step"
+                  },
+                  {
+                    "fieldName": "num_ids",
+                    "numberFormat": "0,",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "float",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 100001,
+                    "title": "Number of Identifiers",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "num_ids"
+                  },
+                  {
+                    "fieldName": "pct_universe",
+                    "numberFormat": "0.0%",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "float",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 100002,
+                    "title": "% of Universe",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "description": "",
+                    "scalePercentBy100": true,
+                    "displayName": "pct_universe"
+                  }
+                ]
+              },
+              "invisibleColumns": [],
+              "allowHTMLByDefault": false,
+              "itemsPerPage": 25,
+              "paginationSize": "default",
+              "condensed": true,
+              "withRowNumber": false,
+              "frame": {
+                "showTitle": true,
+                "title": "Campaign Segment Match Waterfall"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 1,
+            "width": 3,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "a94cdea5",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "15f3fa49",
+                  "fields": [
+                    {
+                      "name": "sum(num_inds)",
+                      "expression": "SUM(`num_inds`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(num_inds)",
+                  "displayName": "Sum of num_inds"
+                }
+              },
+              "frame": {
+                "title": "Total Individuals Available for Distribution",
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 1,
+            "width": 1,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "6183deb6",
+            "multilineTextboxSpec": {
+              "lines": [
+                "This report contains the results from the automated segment translation process from the MegaCorp-Partner Clean Room."
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "9e485b59",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0d627cae",
+                  "fields": [
+                    {
+                      "name": "age_range",
+                      "expression": "`age_range`"
+                    },
+                    {
+                      "name": "sum(num_individuals)",
+                      "expression": "SUM(`num_individuals`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "age_range",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "natural-order"
+                    }
+                  },
+                  "displayName": "age_range"
+                },
+                "y": {
+                  "fieldName": "sum(num_individuals)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Number of Individuals"
+                },
+                "label": {
+                  "show": false
+                }
+              },
+              "frame": {
+                "title": "Number of Individuals by Age Break",
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 5,
+            "width": 3,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "b0da13d4",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "e13a8338",
+                  "fields": [
+                    {
+                      "name": "sum(num_individuals)",
+                      "expression": "SUM(`num_individuals`)"
+                    },
+                    {
+                      "name": "gender",
+                      "expression": "`gender`"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`num_individuals` IN (`num_individuals`) OR TRUE"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "sum(num_individuals)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "% of Individuals"
+                },
+                "color": {
+                  "fieldName": "gender",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Gender"
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "frame": {
+                "title": "Gender Distribution",
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "82169394",
+            "queries": [
+              {
+                "name": "dashboards/01f034b7253c1a74865c20c84a3b4fe4/datasets/01f03a9a2cea108f8718666d9ee279ba_distributor_name",
+                "query": {
+                  "datasetName": "34e035c2",
+                  "fields": [
+                    {
+                      "name": "distributor_name",
+                      "expression": "`distributor_name`"
+                    },
+                    {
+                      "name": "distributor_name_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_dashboards/01f034b7253c1a74865c20c84a3b4fe4/datasets/01f034b7253d1112be0310cc5d6d9273_Distributor",
+                "query": {
+                  "datasetName": "d9335995",
+                  "parameters": [
+                    {
+                      "name": "Distributor",
+                      "keyword": "Distributor"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "parameterName": "Distributor",
+                    "queryName": "parameter_dashboards/01f034b7253c1a74865c20c84a3b4fe4/datasets/01f034b7253d1112be0310cc5d6d9273_Distributor"
+                  },
+                  {
+                    "fieldName": "distributor_name",
+                    "displayName": "distributor_name",
+                    "queryName": "dashboards/01f034b7253c1a74865c20c84a3b4fe4/datasets/01f03a9a2cea108f8718666d9ee279ba_distributor_name"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Distributor"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 2,
+            "height": 1
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    },
+    {
+      "name": "f54c6a8f",
+      "displayName": "(DRAFT) Census Report",
+      "layout": [
+        {
+          "widget": {
+            "name": "797171f6",
+            "multilineTextboxSpec": {
+              "lines": [
+                "### Census Information"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "bab8a423",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "7c939bdc",
+                  "fields": [
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    },
+                    {
+                      "name": "country",
+                      "expression": "`country`"
+                    },
+                    {
+                      "name": "state_name",
+                      "expression": "`state_name`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "choropleth-map",
+              "encodings": {
+                "color": {
+                  "fieldName": "count(*)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Count of Records"
+                },
+                "extra": [
+                  {
+                    "fieldName": "count(*)",
+                    "displayName": "Count of Records"
+                  }
+                ],
+                "region": {
+                  "regionType": "mapbox-v4-admin",
+                  "admin0": {
+                    "fieldName": "country",
+                    "type": "field",
+                    "geographicRole": "admin0-unit-code",
+                    "displayName": "country"
+                  },
+                  "admin1": {
+                    "fieldName": "state_name",
+                    "type": "field",
+                    "geographicRole": "admin1-name",
+                    "displayName": "state_name"
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Location of all individuals"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 3,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "canvasBackgroundColor": {
+        "light": "#FAFAFB",
+        "dark": "#1F272D"
+      },
+      "widgetBackgroundColor": {
+        "light": "#FFFFFF",
+        "dark": "#11171C"
+      },
+      "fontColor": {
+        "light": "#11171C",
+        "dark": "#E8ECF0"
+      },
+      "selectionColor": {
+        "light": "#2272B4",
+        "dark": "#8ACAFF"
+      },
+      "visualizationColors": [
+        "#077A9D",
+        "#FFAB00",
+        "#00A972",
+        "#FF3621",
+        "#8BCAE7",
+        "#AB4057",
+        "#99DDB4",
+        "#FCA4A1",
+        "#919191",
+        "#BF7080"
+      ],
+      "widgetHeaderAlignment": "LEFT"
+    }
+  }
+}
