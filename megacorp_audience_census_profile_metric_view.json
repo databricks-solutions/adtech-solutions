@@ -1,0 +1,37 @@
+version: 0.1
+
+source: achu_demos.profiles.megacorp_audience_census_profile
+
+dimensions:
+  - name: State
+    expr: state
+  - name: ZIP Code
+    expr: zip5
+  - name: Age
+    expr: age
+  - name: Gender
+    expr: gender
+  - name: Dog Owner
+    expr: is_dog_owner
+  - name: Cat Owner
+    expr: is_cat_owner
+  - name: QSR Propensity
+    expr: qsr_propensity
+  - name: Age Group
+    expr: CASE WHEN age < 18 THEN 'Child'
+               WHEN age < 65 THEN 'Adult'
+               ELSE 'Senior' END
+
+measures:
+  - name: Distinct Household Count
+    expr: COUNT(DISTINCT megacorp_hhid)
+  - name: 95% Age
+    expr: PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY age)
+  - name: Dog Owner %
+    expr: AVG(CAST(is_dog_owner AS INT))
+  - name: Total Individuals
+    expr: COUNT(*)
+  - name: Dog Ownership Surplus (%)
+    expr: AVG(CAST(is_dog_owner AS INT)) - AVG(CAST(is_cat_owner AS INT))
+  - name: QSR High Propensity Count
+    expr: COUNT(1) FILTER (WHERE qsr_propensity='high')
