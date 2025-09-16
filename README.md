@@ -4,9 +4,24 @@ Welcome to the Databricks for AdTech Solutions repository — a curated collecti
 
 ## What You'll Find in the AdTech Repo
 
--
--
--
+### 📊 Data Samples for AIBI Genie Session
+The [`megacorp_data`](./megacorp_data) folder contains the datasets used in the **AIBI Genie** session.  
+To get started:  
+1. Upload the provided **Parquet** files into your workspace.  
+2. Follow along with the training exercises.  
+
+Additionally, the file [`megacorp_audience_census_profile_metric_view.json`](./megacorp_audience_census_profile_metric_view.json) defines the **metric view** for Megacorp’s business KPIs.  
+
+#### 📂 Available Data Sources
+
+- **`megacorp_campaigns`**  
+  Contains marketing campaign data, linking individuals (`megacorp_indid`) to households (`megacorp_hhid`) and campaign names.
+
+- **`megacorp_audience_census_profile`**  
+  Provides demographic and behavioral profiles for individuals and households, including attributes such as age, gender, state, and pet ownership.
+
+- **`megacorp_segment_definitions`**  
+  Defines marketing segments, including segment names, descriptions, and active dates.
 
 ## Installation
 
