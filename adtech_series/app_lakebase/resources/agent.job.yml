@@ -1,0 +1,22 @@
+# The main job for adtech_vector_chat.
+resources:
+  jobs:
+
+    adtech_chat_history_agent_job:
+      name: adtech_chat_history_agent_job
+
+      tasks:
+        - task_key: adtech_chat_history_agent
+          notebook_task:
+            notebook_path: ../agents/src/chat-history-agent-pg-genie.ipynb
+            base_parameters:
+              target_catalog: tanner_wendland
+              target_schema: default
+              llm_model_serving_endpoint_name: databricks-claude-3-7-sonnet
+              embedding_model: databricks-gte-large-en
+              database_instance_name: adtech-series-db-do-not-delete
+              postgres_database_name: databricks_postgres
+              secret_scope: adtech-series
+              secret_key: app-secret
+              genie_space_id: 01f07c4ba44615aab8989b10e0a95420
+              marketing_policy_endpoint: ka-c9af3fe4-endpoint

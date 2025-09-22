@@ -1,0 +1,16 @@
+resources:
+
+  # database_instances:
+  #   tannerw_adtech_db:
+  #     name: "tannerw-adtech-db"
+  #     capacity: "CU_1"
+  #     permissions:
+  #       - group_name: "Tanner W Adtech DB Access Role"
+  #         level: "CAN_MANAGE"
+
+  apps:
+    data_app:
+      name: "adtech-series-do-not-delete"
+      source_code_path: ../app
+      description: "A Dash application for the Adtech Series around Databricks Apps and Lakebase, showcasing chat agents with memory."
+
