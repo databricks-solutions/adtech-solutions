@@ -1,0 +1,731 @@
+{
+  "dashboard_id": "3769ebfb93e8fea0d14741d1c0ba0c41",
+  "displayName": "AdTech Analytics Dashboard",
+  "warehouseId": "862f1d757f0424f7",
+  "datasets": [
+    {
+      "name": "1ab70b2e",
+      "displayName": "Campaign Analytics",
+      "queryLines": [
+        "SELECT \n",
+        "    COALESCE(c.campaign_name, 'Unknown Campaign') as campaign_name,\n",
+        "    COALESCE(c.megacorp_indid, 'N/A') as individual_id,\n",
+        "    COALESCE(c.megacorp_hhid, 'N/A') as household_id,\n",
+        "    COALESCE(p.state, 'Unknown') as state,\n",
+        "    COALESCE(p.age, 0) as age,\n",
+        "    COALESCE(p.gender, 'Unknown') as gender,\n",
+        "    COALESCE(p.is_dog_owner, false) as is_dog_owner,\n",
+        "    COALESCE(p.is_cat_owner, false) as is_cat_owner,\n",
+        "    COALESCE(p.qsr_propensity, 'Unknown') as qsr_propensity,\n",
+        "    CASE WHEN c.megacorp_indid IS NOT NULL THEN 1 ELSE 0 END as campaign_reach,\n",
+        "    CASE WHEN p.megacorp_indid IS NOT NULL THEN 1 ELSE 0 END as profile_available\n",
+        "FROM achu_demos.segments.megacorp_campaigns c LEFT JOIN achu_demos.profiles.megacorp_audience_census_profile p ON c.megacorp_indid = p.megacorp_indid\n"
+      ]
+    },
+    {
+      "name": "e162ca92",
+      "displayName": "Demographics Summary",
+      "queryLines": [
+        "SELECT \n",
+        "    COALESCE(state, 'Unknown') as state,\n",
+        "    COALESCE(gender, 'Unknown') as gender,\n",
+        "    COALESCE(age, 0) as age,\n",
+        "    COALESCE(qsr_propensity, 'Unknown') as qsr_propensity,\n",
+        "    CASE WHEN is_dog_owner = true THEN 1 ELSE 0 END as dog_owners,\n",
+        "    CASE WHEN is_cat_owner = true THEN 1 ELSE 0 END as cat_owners,\n",
+        "    1 as profile_count\n",
+        "FROM achu_demos.profiles.megacorp_audience_census_profile\n"
+      ]
+    },
+    {
+      "name": "17c08dee",
+      "displayName": "Segment Info",
+      "queryLines": [
+        "SELECT \n",
+        "    COALESCE(segment_name, 'Unnamed Segment') as segment_name,\n",
+        "    COALESCE(segment_definition, 'No definition provided') as segment_definition,\n",
+        "    COALESCE(quarter, 'Unknown') as quarter,\n",
+        "    COALESCE(start_date, CURRENT_DATE()) as start_date,\n",
+        "    COALESCE(end_date, CURRENT_DATE()) as end_date\n",
+        "FROM achu_demos.segments.megacorp_segment_definitions\n"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "5daf730e",
+      "displayName": "AdTech Analytics Dashboard",
+      "layout": [
+        {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          },
+          "widget": {
+            "name": "4df2d0d7",
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "individual_id",
+                  "displayName": "individual_id"
+                }
+              },
+              "frame": {
+                "title": "Total Campaign Reach",
+                "showTitle": true
+              }
+            },
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "1ab70b2e",
+                  "disaggregated": false,
+                  "fields": [
+                    {
+                      "name": "individual_id",
+                      "expression": "COUNT(DISTINCT individual_id)"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "position": {
+            "x": 3,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          },
+          "widget": {
+            "name": "4a8e5f4d",
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "household_id",
+                  "displayName": "household_id"
+                }
+              },
+              "frame": {
+                "title": "Unique Households",
+                "showTitle": true
+              }
+            },
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "1ab70b2e",
+                  "disaggregated": false,
+                  "fields": [
+                    {
+                      "name": "household_id",
+                      "expression": "COUNT(DISTINCT household_id)"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          },
+          "widget": {
+            "name": "ff9e475a",
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "campaign_name",
+                  "displayName": "campaign_name"
+                }
+              },
+              "frame": {
+                "title": "Active Campaigns",
+                "showTitle": true
+              }
+            },
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "1ab70b2e",
+                  "disaggregated": false,
+                  "fields": [
+                    {
+                      "name": "campaign_name",
+                      "expression": "COUNT(DISTINCT campaign_name)"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "position": {
+            "x": 9,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          },
+          "widget": {
+            "name": "2c871600",
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "state",
+                  "displayName": "state"
+                }
+              },
+              "frame": {
+                "title": "Geographic Markets",
+                "showTitle": true
+              }
+            },
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "e162ca92",
+                  "disaggregated": false,
+                  "fields": [
+                    {
+                      "name": "state",
+                      "expression": "COUNT(DISTINCT state)"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 3,
+            "height": 2
+          },
+          "widget": {
+            "name": "5e8d5c65",
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "dog_owners",
+                  "displayName": "dog_owners"
+                }
+              },
+              "frame": {
+                "title": "Dog Owner Households",
+                "showTitle": true
+              }
+            },
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "e162ca92",
+                  "disaggregated": false,
+                  "fields": [
+                    {
+                      "name": "dog_owners",
+                      "expression": "SUM(dog_owners)"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "position": {
+            "x": 3,
+            "y": 2,
+            "width": 3,
+            "height": 2
+          },
+          "widget": {
+            "name": "fe466484",
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "cat_owners",
+                  "displayName": "cat_owners"
+                }
+              },
+              "frame": {
+                "title": "Cat Owner Households",
+                "showTitle": true
+              }
+            },
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "e162ca92",
+                  "disaggregated": false,
+                  "fields": [
+                    {
+                      "name": "cat_owners",
+                      "expression": "SUM(cat_owners)"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "position": {
+            "x": 6,
+            "y": 3,
+            "width": 6,
+            "height": 4
+          },
+          "widget": {
+            "name": "70218a74",
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "campaign_name",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "campaign_name"
+                },
+                "y": {
+                  "fieldName": "campaign_reach",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "campaign_reach"
+                }
+              },
+              "frame": {
+                "title": "Campaign Performance",
+                "showTitle": true
+              }
+            },
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "1ab70b2e",
+                  "disaggregated": false,
+                  "fields": [
+                    {
+                      "name": "campaign_name",
+                      "expression": "`campaign_name`"
+                    },
+                    {
+                      "name": "campaign_reach",
+                      "expression": "SUM(campaign_reach)"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "position": {
+            "x": 0,
+            "y": 4,
+            "width": 6,
+            "height": 4
+          },
+          "widget": {
+            "name": "17e4361b",
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "profile_count",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "profile_count"
+                },
+                "color": {
+                  "fieldName": "gender",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "gender"
+                }
+              },
+              "frame": {
+                "title": "Audience Gender Split",
+                "showTitle": true
+              }
+            },
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "e162ca92",
+                  "disaggregated": false,
+                  "fields": [
+                    {
+                      "name": "profile_count",
+                      "expression": "SUM(profile_count)"
+                    },
+                    {
+                      "name": "gender",
+                      "expression": "`gender`"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "position": {
+            "x": 6,
+            "y": 7,
+            "width": 6,
+            "height": 4
+          },
+          "widget": {
+            "name": "427849b6",
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "state",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "state"
+                },
+                "y": {
+                  "fieldName": "profile_count",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "profile_count"
+                }
+              },
+              "frame": {
+                "title": "Top Markets by Audience Size",
+                "showTitle": true
+              }
+            },
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "e162ca92",
+                  "disaggregated": false,
+                  "fields": [
+                    {
+                      "name": "state",
+                      "expression": "`state`"
+                    },
+                    {
+                      "name": "profile_count",
+                      "expression": "SUM(profile_count)"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "position": {
+            "x": 0,
+            "y": 8,
+            "width": 6,
+            "height": 4
+          },
+          "widget": {
+            "name": "efaaaeac",
+            "spec": {
+              "version": 3,
+              "widgetType": "histogram",
+              "encodings": {
+                "x": {
+                  "fieldName": "bin(age, binWidth=10)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "age"
+                },
+                "y": {
+                  "fieldName": "count(*)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Count of Records"
+                }
+              },
+              "frame": {
+                "title": "Age Distribution",
+                "showTitle": true
+              }
+            },
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "e162ca92",
+                  "disaggregated": false,
+                  "fields": [
+                    {
+                      "name": "bin(age, binWidth=10)",
+                      "expression": "BIN_FLOOR(`age`, 10)"
+                    },
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "position": {
+            "x": 0,
+            "y": 12,
+            "width": 12,
+            "height": 4
+          },
+          "widget": {
+            "name": "b4d7ed1f",
+            "spec": {
+              "version": 3,
+              "widgetType": "heatmap",
+              "encodings": {
+                "x": {
+                  "fieldName": "campaign_name",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "campaign_name"
+                },
+                "y": {
+                  "fieldName": "state",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "state"
+                },
+                "color": {
+                  "fieldName": "campaign_reach",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "campaign_reach"
+                }
+              },
+              "frame": {
+                "title": "Campaign Reach by Market",
+                "showTitle": true
+              }
+            },
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "1ab70b2e",
+                  "disaggregated": false,
+                  "fields": [
+                    {
+                      "name": "campaign_name",
+                      "expression": "`campaign_name`"
+                    },
+                    {
+                      "name": "state",
+                      "expression": "`state`"
+                    },
+                    {
+                      "name": "campaign_reach",
+                      "expression": "SUM(campaign_reach)"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "position": {
+            "x": 0,
+            "y": 16,
+            "width": 6,
+            "height": 4
+          },
+          "widget": {
+            "name": "1b18a791",
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "qsr_propensity",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "qsr_propensity"
+                },
+                "y": {
+                  "fieldName": "profile_count",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "profile_count"
+                }
+              },
+              "frame": {
+                "title": "QSR Propensity Segments",
+                "showTitle": true
+              }
+            },
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "e162ca92",
+                  "disaggregated": false,
+                  "fields": [
+                    {
+                      "name": "qsr_propensity",
+                      "expression": "`qsr_propensity`"
+                    },
+                    {
+                      "name": "profile_count",
+                      "expression": "SUM(profile_count)"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "position": {
+            "x": 0,
+            "y": 20,
+            "width": 12,
+            "height": 6
+          },
+          "widget": {
+            "name": "d3dd342a",
+            "spec": {
+              "version": 1,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "segment_name",
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 0,
+                    "title": "segment_name"
+                  },
+                  {
+                    "fieldName": "segment_definition",
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 1,
+                    "title": "segment_definition"
+                  },
+                  {
+                    "fieldName": "quarter",
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 2,
+                    "title": "quarter"
+                  },
+                  {
+                    "fieldName": "start_date",
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 3,
+                    "title": "start_date"
+                  },
+                  {
+                    "fieldName": "end_date",
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 4,
+                    "title": "end_date"
+                  }
+                ]
+              },
+              "frame": {
+                "title": "Marketing Segment Definitions",
+                "showTitle": true
+              }
+            },
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "17c08dee",
+                  "disaggregated": false,
+                  "fields": [
+                    {
+                      "name": "segment_name",
+                      "expression": "`segment_name`"
+                    },
+                    {
+                      "name": "segment_definition",
+                      "expression": "`segment_definition`"
+                    },
+                    {
+                      "name": "quarter",
+                      "expression": "`quarter`"
+                    },
+                    {
+                      "name": "start_date",
+                      "expression": "`start_date`"
+                    },
+                    {
+                      "name": "end_date",
+                      "expression": "`end_date`"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

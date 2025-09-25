@@ -1,0 +1,439 @@
+{
+  "datasets": [
+    {
+      "name": "74c8adf4",
+      "displayName": "usage",
+      "queryLines": [
+        "SELECT\n",
+        "  *\n",
+        "FROM system.billing.usage"
+      ]
+    },
+    {
+      "name": "6adca914",
+      "displayName": "list_prices",
+      "queryLines": [
+        "SELECT * FROM system.billing.list_prices"
+      ]
+    },
+    {
+      "name": "32ef6fac",
+      "displayName": "cloud_infra_cost",
+      "queryLines": [
+        "SELECT * FROM system.billing.cloud_infra_cost"
+      ]
+    },
+    {
+      "name": "a0192c5d",
+      "displayName": "account_prices",
+      "queryLines": [
+        "SELECT * FROM system.billing.account_prices"
+      ]
+    },
+    {
+      "name": "7c7fcaff",
+      "displayName": "Usage by workspace ID",
+      "queryLines": [
+        "WITH user_usage AS (\n",
+        "SELECT\n",
+        "  identity_metadata.run_as as user_email, \n",
+        "  usage_quantity\n",
+        "FROM system.billing.usage\n",
+        "WHERE usage_date >= CURRENT_DATE() - INTERVAL 90 DAYS\n",
+        " AND identity_metadata.run_as is not null\n",
+        " and identity_metadata.run_as like '%@%'\n",
+        ")\n",
+        "SELECT\n",
+        "  user_email,\n",
+        "  SUM(usage_quantity) AS total_dbus\n",
+        "FROM user_usage\n",
+        "GROUP BY user_email\n",
+        "ORDER BY total_dbus DESC\n",
+        "LIMIT 10;"
+      ]
+    },
+    {
+      "name": "813121ab",
+      "displayName": "audit",
+      "queryLines": [
+        "SELECT\n",
+        "  user_identity.email as user_email,\n",
+        "  COUNT(*) as webterminal_count\n",
+        "FROM system.access.audit \n",
+        "WHERE service_name = 'webTerminal' \n",
+        "  AND action_name = 'startSession'\n",
+        "  AND event_date > now() - interval 90 day\n",
+        "GROUP BY user_identity.email\n",
+        "ORDER BY webterminal_count DESC\n",
+        "LIMIT 10\n"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "6c9025da",
+      "displayName": "system",
+      "layout": [
+        {
+          "widget": {
+            "name": "3a1ece73",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "74c8adf4",
+                  "fields": [
+                    {
+                      "name": "sku_name",
+                      "expression": "`sku_name`"
+                    },
+                    {
+                      "name": "monthly(usage_date)",
+                      "expression": "DATE_TRUNC(\"MONTH\", `usage_date`)"
+                    },
+                    {
+                      "name": "sum(usage_quantity)",
+                      "expression": "SUM(`usage_quantity`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "monthly(usage_date)",
+                  "scale": {
+                    "type": "temporal"
+                  },
+                  "displayName": "usage_date"
+                },
+                "y": {
+                  "fieldName": "sum(usage_quantity)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Sum of usage_quantity"
+                },
+                "color": {
+                  "fieldName": "sku_name",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "sku_name"
+                }
+              },
+              "frame": {
+                "title": "Spend by sku_name over past 6 months",
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "2ccb9ea1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "813121ab",
+                  "fields": [
+                    {
+                      "name": "user_email",
+                      "expression": "`user_email`"
+                    },
+                    {
+                      "name": "sum(webterminal_count)",
+                      "expression": "SUM(`webterminal_count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "user_email",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "user_email"
+                },
+                "y": {
+                  "fieldName": "sum(webterminal_count)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "log ins"
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "frame": {
+                "title": "Log Ins by Workspace ID",
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 13,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "fa0b78ee",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "7c7fcaff",
+                  "fields": [
+                    {
+                      "name": "user_email",
+                      "expression": "`user_email`"
+                    },
+                    {
+                      "name": "sum(total_dbus)",
+                      "expression": "SUM(`total_dbus`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "user_email",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  },
+                  "displayName": "user_email"
+                },
+                "y": {
+                  "fieldName": "sum(total_dbus)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Sum of total_dbus"
+                }
+              },
+              "frame": {
+                "title": "Usage Quantity by User for top 10 users over past 90 days",
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 13,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "fa35b03e",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "74c8adf4",
+                  "fields": [
+                    {
+                      "name": "monthly(usage_date)",
+                      "expression": "DATE_TRUNC(\"MONTH\", `usage_date`)"
+                    },
+                    {
+                      "name": "sum(usage_quantity)",
+                      "expression": "SUM(`usage_quantity`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "monthly(usage_date)",
+                  "scale": {
+                    "type": "temporal"
+                  },
+                  "displayName": "usage_date"
+                },
+                "y": {
+                  "fieldName": "sum(usage_quantity)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Sum of usage_quantity"
+                }
+              },
+              "frame": {
+                "title": "Usage over time",
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 7,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "85fd8d46",
+            "queries": [
+              {
+                "name": "dashboards/01f04887083e1fa7bd663e5e486c559f/datasets/01f0488725371d3e97dadd5ec7d52513_sku_name",
+                "query": {
+                  "datasetName": "74c8adf4",
+                  "fields": [
+                    {
+                      "name": "sku_name",
+                      "expression": "`sku_name`"
+                    },
+                    {
+                      "name": "sku_name_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "sku_name",
+                    "displayName": "sku_name",
+                    "queryName": "dashboards/01f04887083e1fa7bd663e5e486c559f/datasets/01f0488725371d3e97dadd5ec7d52513_sku_name"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 2,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "ebf73714",
+            "queries": [
+              {
+                "name": "dashboards/01f04887083e1fa7bd663e5e486c559f/datasets/01f0488725371d3e97dadd5ec7d52513_workspace_id",
+                "query": {
+                  "datasetName": "74c8adf4",
+                  "fields": [
+                    {
+                      "name": "workspace_id",
+                      "expression": "`workspace_id`"
+                    },
+                    {
+                      "name": "workspace_id_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "workspace_id",
+                    "displayName": "workspace_id",
+                    "queryName": "dashboards/01f04887083e1fa7bd663e5e486c559f/datasets/01f0488725371d3e97dadd5ec7d52513_workspace_id"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 0,
+            "width": 2,
+            "height": 1
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "canvasBackgroundColor": {
+        "light": "#FAFAFB",
+        "dark": "#1F272D"
+      },
+      "widgetBackgroundColor": {
+        "light": "#FFFFFF",
+        "dark": "#11171C"
+      },
+      "fontColor": {
+        "light": "#11171C",
+        "dark": "#E8ECF0"
+      },
+      "selectionColor": {
+        "light": "#2272B4",
+        "dark": "#8ACAFF"
+      },
+      "visualizationColors": [
+        "#077A9D",
+        "#FFAB00",
+        "#00A972",
+        "#FF3621",
+        "#8BCAE7",
+        "#AB4057",
+        "#99DDB4",
+        "#FCA4A1",
+        "#919191",
+        "#BF7080"
+      ],
+      "widgetHeaderAlignment": "LEFT"
+    }
+  }
+}
