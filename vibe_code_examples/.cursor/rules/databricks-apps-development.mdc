@@ -1,0 +1,445 @@
+---
+alwaysApply: true
+description: "Databricks Apps development using Databricks Asset Bundles (DABs)"
+---
+
+# Databricks Apps Development with Asset Bundles
+
+This rule provides comprehensive guidance for developing Databricks Apps using Databricks Asset Bundles (DABs) for deployment and lifecycle management.
+
+## Project Structure for Databricks Apps
+
+### Standard DAB App Structure
+
+```
+project-root/
+├── databricks.yml              # Main asset bundle configuration
+├── src/                        # Application source code
+│   ├── app.py                 # Main Streamlit/Dash app entry point
+│   ├── requirements.txt       # App-specific dependencies
+│   └── config/                # App configuration files
+├── resources/                  # DAB resource definitions
+│   ├── apps.yml               # App resource configurations
+│   └── jobs.yml               # Associated job definitions (optional)
+├── environments/               # Environment-specific configurations
+│   ├── dev.yml                # Development environment
+│   ├── staging.yml            # Staging environment
+│   └── prod.yml               # Production environment
+└── tests/                     # Application tests
+```
+
+## Core Configuration Files
+
+### Main Asset Bundle Configuration
+
+The [databricks.yml](mdc:databricks.yml) file is the central configuration:
+
+```yaml
+bundle:
+  name: "my-databricks-app"
+  
+variables:
+  app_name:
+    description: "Name of the Databricks App"
+    default: "my-streamlit-app"
+
+targets:
+  dev:
+    mode: development
+    workspace:
+      host: ${workspace.host}
+    variables:
+      app_name: "${bundle.name}-dev"
+  
+  prod:
+    mode: production
+    workspace:
+      host: ${workspace.host}
+    variables:
+      app_name: "${bundle.name}-prod"
+
+resources:
+  apps:
+    my_app:
+      name: "${var.app_name}"
+      description: "My Databricks App deployed via DAB"
+      source_code_path: "./src"
+      config:
+        env:
+          - name: "ENVIRONMENT"
+            value: "${bundle.target}"
+```
+
+### App Resource Configuration
+
+Define apps in `resources/apps.yml`:
+
+```yaml
+resources:
+  apps:
+    streamlit_app:
+      name: "${var.app_name}"
+      description: "Streamlit application"
+      source_code_path: "./src"
+      config:
+        env:
+          - name: "DATABASE_URL"
+            value: "${var.database_url}"
+          - name: "DEBUG"
+            value: "false"
+```
+
+## Application Development Guidelines
+
+### 1. App Entry Point Structure
+
+Create [src/app.py](mdc:src/app.py) as the main entry point:
+
+```python
+import streamlit as st
+import os
+from databricks import sql
+from databricks.sdk import WorkspaceClient
+
+# Initialize Databricks workspace client
+w = WorkspaceClient()
+
+# App configuration from environment
+APP_ENV = os.getenv("ENVIRONMENT", "dev")
+DEBUG = os.getenv("DEBUG", "false").lower() == "true"
+
+def main():
+    st.title("My Databricks App")
+    
+    # App logic here
+    if DEBUG:
+        st.write(f"Running in {APP_ENV} environment")
+
+if __name__ == "__main__":
+    main()
+```
+
+### 2. Dependencies Management
+
+Create [src/requirements.txt](mdc:src/requirements.txt) for app-specific dependencies:
+
+```
+streamlit>=1.28.0
+databricks-sql-connector>=3.0.0
+pandas>=2.0.0
+plotly>=5.0.0
+```
+
+### 3. Configuration Management
+
+Use environment-specific configurations in `environments/`:
+
+```yaml
+# environments/dev.yml
+variables:
+  database_url: "databricks://dev-workspace"
+  debug_mode: "true"
+  
+# environments/prod.yml  
+variables:
+  database_url: "databricks://prod-workspace"
+  debug_mode: "false"
+```
+
+## DAB Commands for App Development
+
+### Essential DAB Commands
+
+```bash
+# Initialize a new DAB project
+databricks bundle init
+
+# Validate bundle configuration
+databricks bundle validate
+
+# Deploy to development environment
+databricks bundle deploy --target dev
+
+# Deploy to production environment  
+databricks bundle deploy --target prod
+
+# Run the app locally for testing
+databricks bundle run --target dev
+
+# Destroy deployed resources
+databricks bundle destroy --target dev
+```
+
+### App-Specific Commands
+
+```bash
+# List deployed apps
+databricks apps list
+
+# Get app details
+databricks apps get <app-name>
+
+# View app logs
+databricks apps logs <app-name>
+
+# Start/stop apps
+databricks apps start <app-name>
+databricks apps stop <app-name>
+
+# Update app configuration
+databricks apps update <app-name> --config-file ./config.json
+```
+
+## Development Workflow
+
+### 1. Local Development
+
+```bash
+# Set up local environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+pip install -r src/requirements.txt
+
+# Run app locally with Databricks Connect
+export DATABRICKS_HOST="<your-workspace-url>"
+export DATABRICKS_TOKEN="<your-token>"
+streamlit run src/app.py
+```
+
+### 2. Development Deployment
+
+```bash
+# Validate configuration
+databricks bundle validate --target dev
+
+# Deploy to development
+databricks bundle deploy --target dev
+
+# Monitor deployment
+databricks apps get "${bundle.name}-dev"
+```
+
+### 3. Production Deployment
+
+```bash
+# Deploy to production
+databricks bundle deploy --target prod
+
+# Verify deployment
+databricks apps list
+databricks apps get "${bundle.name}-prod"
+```
+
+## Security and Best Practices
+
+### 1. Environment Variables and Secrets
+
+Use Databricks secrets for sensitive data:
+
+```yaml
+# In databricks.yml
+resources:
+  apps:
+    my_app:
+      config:
+        env:
+          - name: "DATABASE_PASSWORD"
+            value: "${secrets.main.db_password}"
+```
+
+### 2. Access Control
+
+Configure proper permissions:
+
+```yaml
+resources:
+  apps:
+    my_app:
+      config:
+        permissions:
+          - principal: "users"
+            permission_level: "CAN_USE"
+          - principal: "data-team"  
+            permission_level: "CAN_MANAGE"
+```
+
+
+## Testing and Quality Assurance
+
+### 1. Local Testing
+
+Create [tests/test_app.py](mdc:tests/test_app.py):
+
+```python
+import pytest
+import sys
+import os
+
+# Add src to path for testing
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+
+def test_app_imports():
+    """Test that app imports successfully"""
+    import app
+    assert hasattr(app, 'main')
+
+def test_environment_config():
+    """Test environment configuration"""
+    os.environ['ENVIRONMENT'] = 'test'
+    import app
+    # Add your tests here
+```
+
+### 2. Integration Testing
+
+```bash
+# Test deployment to dev environment
+databricks bundle deploy --target dev
+databricks bundle run --target dev
+
+# Validate app is running
+databricks apps get "${bundle.name}-dev"
+```
+
+## Monitoring and Observability
+
+### 1. App Monitoring
+
+```bash
+# Monitor app health
+databricks apps get <app-name> --output json | jq '.status'
+
+# View app metrics
+databricks apps logs <app-name> --tail
+
+# Check resource usage
+databricks apps get <app-name> --include-usage
+```
+
+### 2. Logging Best Practices
+
+In your [src/app.py](mdc:src/app.py):
+
+```python
+import logging
+import os
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO if os.getenv("DEBUG") == "true" else logging.WARNING,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+logger = logging.getLogger(__name__)
+
+def main():
+    logger.info("Starting Databricks app")
+    # App logic
+    logger.info("App started successfully")
+```
+
+## Troubleshooting Common Issues
+
+### 1. Deployment Issues
+
+```bash
+# Check bundle validation
+databricks bundle validate --target dev
+
+# Verify workspace permissions
+databricks current-user me
+
+# Check resource conflicts
+databricks apps list
+```
+
+### 2. Runtime Issues
+
+```bash
+# Check app logs
+databricks apps logs <app-name>
+
+# Verify environment variables
+databricks apps get <app-name> --output json | jq '.config.env'
+
+# Test connectivity
+databricks workspace get-status /
+```
+
+## Integration with Other Databricks Services
+
+### 1. Unity Catalog Integration
+
+```python
+# In your app
+from databricks.sdk import WorkspaceClient
+
+w = WorkspaceClient()
+
+# Access Unity Catalog tables
+def get_data():
+    with w.sql.warehouses.get_by_name("my-warehouse") as warehouse:
+        result = warehouse.execute("SELECT * FROM catalog.schema.table LIMIT 10")
+        return result.fetchall()
+```
+
+### 2. MLflow Integration
+
+```python
+import mlflow
+from databricks.sdk import WorkspaceClient
+
+# Initialize MLflow with Databricks
+mlflow.set_tracking_uri("databricks")
+
+def load_model():
+    model = mlflow.pyfunc.load_model("models:/my-model/Production")
+    return model
+```
+
+## Continuous Integration/Deployment
+
+### 1. GitHub Actions Example
+
+Create `.github/workflows/databricks-app-ci.yml`:
+
+```yaml
+name: Databricks App CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install Databricks CLI
+        run: pip install databricks-cli
+        
+      - name: Deploy to Dev
+        run: |
+          databricks bundle deploy --target dev
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+```
+Use this command for flask apps and do not add additional commands:
+command:
+  - gunicorn
+  - app:app
+  - -w
+  - '4'
+
+
+This rule provides comprehensive guidance for developing Databricks Apps using Asset Bundles, covering the full development lifecycle from local development to production deployment.

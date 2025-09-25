@@ -1,0 +1,82 @@
+---
+alwaysApply: true
+---
+      source_code_path: "./src"
+```
+
+### `src/app.yaml` - Runtime Configuration
+```yaml
+command:
+  - gunicorn
+  - app:app
+  - -w
+  - '4'
+```
+
+### `src/requirements.txt` - App Dependencies
+```
+Flask==3.0.3
+gunicorn==23.0.0
+```
+
+## Deployment Process
+
+### Two-Step Deployment Required
+
+Databricks Apps require a **two-step deployment process**:
+
+1. **Bundle Deployment** - Creates app infrastructure and uploads files
+2. **Source Code Deployment** - Deploys the actual application code
+
+### Commands
+
+```bash
+# Step 1: Deploy the bundle (creates infrastructure, uploads files)
+databricks bundle deploy --target dev
+
+# Step 2: Deploy source code (starts the app)
+databricks apps deploy <app-name> --source-code-path <workspace-path-to-src>
+```
+
+### Example for this project:
+```bash
+# Step 1: Bundle deployment
+databricks bundle deploy --target dev
+
+# Step 2: Source code deployment
+databricks apps deploy hello-world-flask-app-dev \
+  --source-code-path /Workspace/Users/your-email@domain.com/.bundle/hello-world-flask-app/dev/files/src
+```
+
+## Verification Commands
+
+```bash
+# Check app status
+databricks apps get <app-name>
+
+# List deployments
+databricks apps list-deployments <app-name>
+
+# List all apps
+databricks apps list
+```
+
+## Common Issues
+
+### Issue: "App has not been deployed yet"
+**Cause**: Only bundle was deployed, source code deployment missing
+**Solution**: Run the source code deployment command (Step 2)
+
+### Issue: Config section warning
+**Cause**: Having `config` in `databricks.yml` when `app.yaml` exists
+**Solution**: Remove `config` section from `databricks.yml`, use `src/app.yaml` instead
+
+## App Access
+Once deployed successfully, your app will be accessible at:
+`https://<app-name>-<workspace-id>.aws.databricksapps.com`
+
+## Key Points
+- Bundle deployment ≠ App deployment (two separate steps)
+- Use `app.yaml` for runtime config, not `databricks.yml` config section
+- Source code path must be a workspace path, not local path
+- App status should show "RUNNING" when successful
