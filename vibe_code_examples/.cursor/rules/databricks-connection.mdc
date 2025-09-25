@@ -1,0 +1,80 @@
+---
+alwaysApply: false
+---
+# Databricks Connection Configuration
+
+This project is configured to use Databricks with dynamic CLI-based authentication and workspace discovery.
+
+## Dynamic Configuration Approach
+
+**IMPORTANT**: Always use the Databricks CLI to get current connection information dynamically. Never hardcode workspace details.
+
+### Getting Current Connection Info
+
+Use these commands to discover current Databricks configuration:
+
+```bash
+# Get current user and workspace details
+databricks current-user me
+
+# Get workspace configuration
+cat ~/.databrickscfg
+
+# List workspace contents
+databricks workspace list /
+
+# Get available warehouses
+databricks sql warehouses list
+
+# Check workspace permissions
+databricks workspace get-status /
+```
+
+## Configuration Files
+
+The Databricks connection is configured through:
+
+- [databricks.yml](mdc:databricks.yml) - Asset bundle configuration
+- `~/.databrickscfg` - CLI configuration with host and auth settings  
+- [requirements.txt](mdc:requirements.txt) - Python dependencies including databricks-sdk
+
+## Development Guidelines
+
+When working with Databricks in this project:
+
+1. **Dynamic Discovery**: Always use `databricks current-user me` to get current workspace and user info
+2. **Authentication**: Use the pre-configured Databricks CLI authentication
+3. **SDK Usage**: The `databricks-sdk` is available for programmatic access
+4. **Asset Bundles**: Extend [databricks.yml](mdc:databricks.yml) for deployment configuration
+5. **Workspace Exploration**: Use `databricks workspace list <path>` to explore workspace structure
+6. **Resource Discovery**: Use CLI commands to discover available resources dynamically
+
+## Essential CLI Commands for Discovery
+
+```bash
+# Current user and workspace info
+databricks current-user me
+
+# Workspace exploration
+databricks workspace list /
+databricks workspace list /Repos
+
+# Cluster and compute resources
+databricks clusters list
+databricks sql warehouses list
+
+# Jobs and workflows
+databricks jobs list
+
+# Unity Catalog exploration
+databricks catalogs list
+databricks schemas list --catalog-name <catalog>
+databricks tables list --catalog-name <catalog> --schema-name <schema>
+```
+
+## Best Practices
+
+- **Always query current state** rather than assuming configuration
+- **Use CLI commands** to discover available resources before coding
+- **Check permissions** dynamically using appropriate CLI commands
+- **Explore workspace structure** before making assumptions about available notebooks/folders
