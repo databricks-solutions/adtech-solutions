@@ -1,6 +1,6 @@
 # Databricks for AdTech Solutions Repository
 
-Welcome to the Databricks for AdTech Solutions repository — a comprehensive collection of production-ready AdTech solutions, including a sophisticated AI-powered chat application with multi-agent capabilities, data analysis tools, and policy governance frameworks.
+Welcome to the Databricks for AdTech Solutions repository — a comprehensive collection of AdTech solutions, including a sophisticated AI-powered chat application with multi-agent capabilities, data analysis tools, and policy governance frameworks.
 
 ### Architecture Diagrams
 ![Architecture Diagram](docs/arch.png)
