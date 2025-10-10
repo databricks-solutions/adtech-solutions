@@ -1,4 +1,4 @@
-# LG Ads Agent Chat Application
+# Agent Chat Application
 
 This Streamlit application provides a chat interface to interact with a Databricks Genie space and displays a campaign reporting dashboard.
 
@@ -7,7 +7,7 @@ This Streamlit application provides a chat interface to interact with a Databric
 1.  **Clone the repository:**
     ```bash
     git clone <your-repository-url>
-    cd lg-demo
+    cd demo
     ```
 
 2.  **Create and activate a virtual environment (recommended):**
@@ -22,7 +22,7 @@ This Streamlit application provides a chat interface to interact with a Databric
     ```
 
 4.  **Set up environment variables:**
-    Create a `.env` file in the `lg-demo` project root directory with the following content:
+    Create a `.env` file in the `demo` project root directory with the following content:
 
     ```
     DATABRICKS_HOST="your_databricks_host_url" # e.g., https://e2-demo-field-eng.cloud.databricks.com/
@@ -33,7 +33,7 @@ This Streamlit application provides a chat interface to interact with a Databric
 
 ## Running the Application
 
-1.  Ensure your virtual environment is activated and you are in the `lg-demo` directory.
+1.  Ensure your virtual environment is activated and you are in the `demo` directory.
 2.  Run the Streamlit application:
     ```bash
     streamlit run databricks_chat_app/app.py
@@ -53,7 +53,7 @@ To deploy this application as a Databricks App:
     *   Go to "Compute" -> "Apps".
     *   Click "Create App".
     *   Give your app a name.
-    *   **Source Code:** Choose the method to provide your code (e.g., upload a zip file of your `lg-demo` directory, connect to a Git repository).
+    *   **Source Code:** Choose the method to provide your code (e.g., upload a zip file of your `demo` directory, connect to a Git repository).
     *   **Entrypoint:** Specify `databricks_chat_app/app.py` as the entrypoint or main file to run.
     *   **Python Version:** Select a Python version compatible with your dependencies (e.g., Python 3.9 or 3.10).
     *   **Dependencies:** Databricks will typically try to install dependencies from `requirements.txt` if it's included in your source code. You might also have an option to specify a path to this file or manually list packages.
@@ -78,7 +78,7 @@ For a more streamlined deployment process, you can use the Databricks CLI:
     In your Databricks workspace:
     *   Go to "Compute" -> "Apps"
     *   Click "Create App"
-    *   Give your app a name (e.g., `lg-agent-chat`)
+    *   Give your app a name (e.g., `agent-chat`)
     *   Note the app name for the CLI commands
 
 2.  **Prepare the app.yaml file**
@@ -88,7 +88,7 @@ For a more streamlined deployment process, you can use the Databricks CLI:
     ```
 
 3.  **Sync your files to Databricks Workspace**
-    From your project root directory (`lg-demo`):
+    From your project root directory (`demo`):
     ```bash
     databricks sync . /Workspace/Users/YOUR_EMAIL@databricks.com/YOUR_APP_NAME --profile YOUR_PROFILE
     ```
@@ -101,10 +101,10 @@ For a more streamlined deployment process, you can use the Databricks CLI:
     **Example commands:**
     ```bash
     # Sync with watch mode (recommended for development)
-    databricks sync --watch . /Workspace/Users/charlie.hohenstein@databricks.com/lg-agent-chat --profile DEFAULT
+    databricks sync --watch . /Workspace/Users/charlie.hohenstein@databricks.com/agent-chat --profile DEFAULT
     
     # One-time sync
-    databricks sync . /Workspace/Users/charlie.hohenstein@databricks.com/lg-agent-chat --profile DEFAULT
+    databricks sync . /Workspace/Users/charlie.hohenstein@databricks.com/agent-chat --profile DEFAULT
     ```
 
 4.  **Deploy the app**
@@ -114,7 +114,7 @@ For a more streamlined deployment process, you can use the Databricks CLI:
 
     **Example command:**
     ```bash
-    databricks apps deploy lg-agent-chat --source-code-path /Workspace/Users/charlie.hohenstein@databricks.com/lg-agent-chat/databricks_chat_app --profile DEFAULT
+    databricks apps deploy agent-chat --source-code-path /Workspace/Users/charlie.hohenstein@databricks.com/agent-chat/databricks_chat_app --profile DEFAULT
     ```
 
 ### Important Notes for Databricks App Deployment
@@ -170,7 +170,7 @@ For a more streamlined deployment process, you can use the Databricks CLI:
 ## Project Structure
 
 ```
-lg-demo/
+demo/
 ├── .env                   # Environment variables (DO NOT COMMIT if sensitive)
 ├── requirements.txt       # Python dependencies
 ├── README.md              # This file

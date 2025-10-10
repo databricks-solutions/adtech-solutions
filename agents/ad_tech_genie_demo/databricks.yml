@@ -1,9 +1,9 @@
-# This is a Databricks asset bundle definition for lg-demo.
+# This is a Databricks asset bundle definition for demo.
 # The Databricks extension requires databricks.yml configuration file.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 
 bundle:
-  name: lg-demo
+  name: ad-tech-genie-demo
 
 targets:
   dev:

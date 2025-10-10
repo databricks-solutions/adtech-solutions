@@ -2,10 +2,10 @@ import sys
 import os
 import io # Added for BytesIO
 
-# Calculate the project root directory (lg-demo)
-# __file__ is /Users/charlie.hohenstein/Documents/lg-demo/databricks_chat_app/app.py
-# os.path.dirname(__file__) is /Users/charlie.hohenstein/Documents/lg-demo/databricks_chat_app
-# os.path.abspath(os.path.join(os.path.dirname(__file__), '..')) is /Users/charlie.hohenstein/Documents/lg-demo
+# Calculate the project root directory
+# __file__ is /Users/charlie.hohenstein/Documents/databricks_chat_app/app.py
+# os.path.dirname(__file__) is /Users/charlie.hohenstein/Documents/databricks_chat_app
+# os.path.abspath(os.path.join(os.path.dirname(__file__), '..')) is /Users/charlie.hohenstein/Documents/
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 # Add PROJECT_ROOT to sys.path if it's not already there
@@ -43,7 +43,7 @@ def generate_report_pdf(message_data):
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
     pdf.set_font("Helvetica", "B", 16)
-    pdf.cell(0, 10, "LG Ads Agent Chat Report", border=0, ln=1, align="C")
+    pdf.cell(0, 10, "Agent Chat Report", border=0, ln=1, align="C")
     pdf.ln(5)
 
     # Main Text / Query Description
@@ -335,7 +335,7 @@ def display_charts_from_raw_data(raw_table_data):
         print(f"[APP_ERROR] Histogram charting error: {e_hist_chart}")
 
 # --- Streamlit App Page Config --- 
-st.set_page_config(page_title="LG Ads Agent Chat", layout="wide")
+st.set_page_config(page_title="Agent Chat", layout="wide")
 
 # --- Custom CSS for Modern Look (Akkio Inspired) --- 
 st.markdown("""
@@ -626,14 +626,14 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- App Header (Logo & Title - Top Center) --- 
-LG_LOGO_URL = "https://media.licdn.com/dms/image/v2/D4E0BAQH8TG6njGEP8A/company-logo_200_200/company-logo_200_200/0/1704817058605/lgads_logo?e=1752710400&v=beta&t=vLurf-uPqLZhfh6Efw1kPTgyuOG4YlDcXyCAN-3zoXk"
+LOGO_URL = "lkn"
 
 # Header HTML - This is a fixed header
 st.markdown(f'''
 <div class="main-header-wrapper">
     <div class="sub-header-section header-left">
-        <img src="{LG_LOGO_URL}" alt="LG Logo">
-        <h1>LG Ads Agent Chat</h1>
+        <img src="{LOGO_URL}" alt="LG Logo">
+        <h1>Agent Chat</h1>
     </div>
     <div class="sub-header-section header-right">
         <h1>Campaign Reporting Dashboard</h1>
