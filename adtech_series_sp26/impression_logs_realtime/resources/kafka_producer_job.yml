@@ -1,0 +1,31 @@
+resources:
+  jobs:
+    kafka_producer_job:
+      name: "[${bundle.target}] Kafka Producer - Ad Impression Generator"
+
+      tasks:
+        - task_key: generate_impressions
+          notebook_task:
+            notebook_path: ../src/kafka_producer/generator.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}
+              kafka_topic: ${var.kafka_topic}
+              kafka_secret_scope: ${var.kafka_secret_scope}
+              kafka_secret_key: ${var.kafka_secret_key}
+              records_per_second: "100"
+
+          new_cluster:
+            spark_version: 18.1.x-scala2.13
+            node_type_id: i3.xlarge
+            num_workers: 1
+            aws_attributes:
+              instance_profile_arn: arn:aws:iam::997819012307:instance-profile/one-env-databricks-access
+              first_on_demand: 2
+
+          libraries:
+            - pypi:
+                package: dbldatagen
+
+      continuous:
+        pause_status: PAUSED

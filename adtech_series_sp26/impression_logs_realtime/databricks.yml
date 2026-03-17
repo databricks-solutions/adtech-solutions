@@ -1,0 +1,27 @@
+bundle:
+  name: adtech-impression-logs-realtime
+
+workspace:
+  host: https://e2-demo-field-eng.cloud.databricks.com
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    default: media_advertising
+  schema:
+    default: bronze
+  kafka_topic:
+    default: tanner_wendland_adtech_impressions_realtime_v3
+  kafka_secret_scope:
+    default: oetrta
+  kafka_secret_key:
+    default: kafka-bootstrap-servers-tls
+  admin_user:
+    default: tanner.wendland@databricks.com
+
+targets:
+  dev:
+    default: true
+    mode: development

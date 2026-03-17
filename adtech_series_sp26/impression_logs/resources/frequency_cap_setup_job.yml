@@ -1,0 +1,16 @@
+resources:
+  jobs:
+    frequency_cap_setup_job:
+      name: "[${bundle.target}] Frequency Cap Reference Table Setup"
+
+      tasks:
+        - task_key: setup_frequency_caps
+          notebook_task:
+            notebook_path: ../src/frequency_cap_setup/setup.py
+            base_parameters:
+              catalog: ${var.catalog}
+
+      environments:
+        - environment_key: default
+          spec:
+            client: "4"
