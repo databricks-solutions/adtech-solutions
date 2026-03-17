@@ -1,0 +1,47 @@
+resources:
+  jobs:
+    campaign_pacing_job:
+      name: "[${bundle.target}] Campaign Pacing Consumer"
+
+      tasks:
+        - task_key: pacing_consumer
+          notebook_task:
+            notebook_path: ../src/campaign_pacing/pacing_consumer.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}
+              kafka_topic: ${var.kafka_topic}
+              kafka_secret_scope: ${var.kafka_secret_scope}
+              kafka_secret_key: ${var.kafka_secret_key}
+              lakebase_instance_name: ${resources.database_instances.campaign_pacing_instance.name}
+              lakebase_db_name: "databricks_postgres"
+          job_cluster_key: rtm_cluster
+
+      job_clusters:
+        - job_cluster_key: rtm_cluster
+          new_cluster:
+            spark_version: 18.1.x-scala2.13
+            node_type_id: i3.xlarge
+            num_workers: 2
+            aws_attributes:
+              instance_profile_arn: arn:aws:iam::997819012307:instance-profile/one-env-databricks-access
+              availability: ON_DEMAND
+              first_on_demand: 3
+            spark_conf:
+              # Real-Time Mode
+              spark.databricks.streaming.realTimeMode.enabled: "true"
+              spark.databricks.streaming.realTimeMode.minBatchDuration: "1000ms"
+              # RTM Shuffle Manager
+              spark.shuffle.manager: org.apache.spark.shuffle.streaming.MultiShuffleManager
+              spark.databricks.dagScheduler.type: ConcurrentStageDAGScheduler
+              spark.shuffle.streaming.writerMessageQueueSize: "50"
+              # State Store
+              spark.sql.streaming.stateStore.providerClass: com.databricks.sql.streaming.state.RocksDBStateStoreProvider
+              spark.sql.streaming.stateStore.rocksdb.changelogCheckpointing.enabled: "true"
+              # JDBC Streaming Sink (PrPr)
+              spark.sql.streaming.jdbc.enabled: "true"
+              # Limit shuffle partitions to avoid Lakebase connection rate limit
+              spark.sql.shuffle.partitions: "4"
+
+      continuous:
+        pause_status: PAUSED

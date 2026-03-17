@@ -1,0 +1,31 @@
+resources:
+  alerts:
+    frequency_cap_alert:
+      display_name: "[${bundle.target}] Frequency Cap Violation Alert"
+
+      query_text: |
+        SELECT COUNT(*) AS campaigns_over_target
+        FROM (
+          SELECT f.campaign_name,
+                 ROUND(AVG(f.impression_count), 2) AS avg_freq,
+                 c.in_target_freq
+          FROM ${var.catalog}.gold.megacorp_user_frequency f
+          INNER JOIN ${var.catalog}.gold.campaign_frequency_caps c
+            ON f.campaign_name = c.campaign_name
+          GROUP BY f.campaign_name, c.in_target_freq
+          HAVING AVG(f.impression_count) > c.in_target_freq
+        )
+
+      warehouse_id: ${var.warehouse_id}
+
+      evaluation:
+        source:
+          name: "campaigns_over_target"
+        comparison_operator: GREATER_THAN
+        threshold:
+          value:
+            double_value: 0
+
+      schedule:
+        quartz_cron_schedule: "0 0/15 * * * ?"
+        timezone_id: "America/New_York"

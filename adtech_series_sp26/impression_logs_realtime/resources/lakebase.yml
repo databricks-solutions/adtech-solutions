@@ -1,0 +1,5 @@
+resources:
+  database_instances:
+    campaign_pacing_instance:
+      name: "campaign-pacing"
+      capacity: CU_1

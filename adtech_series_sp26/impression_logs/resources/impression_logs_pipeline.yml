@@ -1,0 +1,36 @@
+# DLT Pipeline Resource Definition
+# Processes impression logs from bronze to silver/gold layers
+
+resources:
+  pipelines:
+    impression_logs_dlt:
+      name: "[${bundle.target}] AdTech Impression Logs Pipeline"
+
+      # Serverless DLT with Photon enabled
+      serverless: true
+      photon: true
+
+      # Unity Catalog configuration
+      catalog: ${var.catalog}
+      target: ${var.target_schema}
+
+      # Pipeline libraries - local transforms
+      libraries:
+        - notebook:
+            path: ../src/impression_logs_transforms/transforms.py
+
+      # Pipeline configuration
+      configuration:
+        # Enable Change Data Feed processing
+        spark.databricks.delta.preview.enabled: "true"
+
+      # Notification settings for failures
+      notifications:
+        - email_recipients:
+            - tanner.wendland@databricks.com
+          alerts:
+            - on-update-failure
+            - on-flow-failure
+
+      # Channel for latest DLT runtime
+      channel: PREVIEW

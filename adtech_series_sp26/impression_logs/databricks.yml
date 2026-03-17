@@ -1,0 +1,37 @@
+# Databricks Asset Bundle Configuration
+# AdTech Impression Logs DLT Pipeline
+bundle:
+  name: adtech-impression-logs-pipeline
+
+# Include pipeline resource definition
+include:
+  - resources/*.yml
+
+# Variable definitions for catalog/schema configuration
+variables:
+  catalog:
+    description: Unity Catalog name
+    default: media_advertising
+  target_schema:
+    description: Target schema for silver tables
+    default: silver
+  warehouse_id:
+    description: SQL warehouse ID for alerts
+    default: "4b9b953939869799"
+
+# Workspace configuration
+workspace:
+  host: https://e2-demo-field-eng.cloud.databricks.com
+
+# Target environments
+targets:
+  dev:
+    mode: development
+    default: true
+    variables:
+      catalog: media_advertising
+      target_schema: silver
+    resources:
+      pipelines:
+        impression_logs_dlt:
+          development: true

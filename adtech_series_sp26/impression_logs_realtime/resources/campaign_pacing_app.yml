@@ -1,0 +1,20 @@
+resources:
+  apps:
+    campaign_pacing:
+      name: "campaign-pacing"
+      description: "Real-time ad campaign pacing dashboard — impressions vs CPM budget"
+      source_code_path: ../campaign_pacing_app
+
+      resources:
+        - name: "campaign-pacing-db"
+          description: "Lakebase Provisioned instance for campaign pacing state"
+          database:
+            database_name: "databricks_postgres"
+            instance_name: ${resources.database_instances.campaign_pacing_instance.name}
+            permission: "CAN_CONNECT_AND_CREATE"
+
+      permissions:
+        - level: CAN_USE
+          group_name: users
+        - level: CAN_MANAGE
+          user_name: ${var.admin_user}

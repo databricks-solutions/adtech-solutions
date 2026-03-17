@@ -1,0 +1,21 @@
+resources:
+  jobs:
+    impression_logs_trigger_job:
+      name: "[${bundle.target}] Impression Logs Pipeline Trigger"
+
+      trigger:
+        table_update:
+          table_names:
+            - "${var.catalog}.bronze.raw_impression_logs"
+          condition: "ANY_UPDATED"
+          wait_after_last_change_seconds: 120
+          min_time_between_triggers_seconds: 300
+
+      tasks:
+        - task_key: refresh_pipeline
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.impression_logs_dlt.id}
+
+#      email_notifications:
+#        on_failure:
+#          - your.email@domain.com

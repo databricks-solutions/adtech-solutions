@@ -1,0 +1,12 @@
+[project]
+name = "campaign-pacing-app"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.115.0",
+    "sqlalchemy>=2.0",
+    "psycopg[binary]>=3.0",
+    "uvicorn[standard]>=0.30.0",
+    "databricks-sdk>=0.81.0",
+    "pydantic-settings>=2.0",
+]

@@ -1,0 +1,20 @@
+resources:
+  jobs:
+    bronze_table_setup_job:
+      name: "[${bundle.target}] Bronze Table Setup"
+
+      tasks:
+        - task_key: setup_bronze_table
+          notebook_task:
+            notebook_path: ../src/bronze_table_setup/setup.py
+            base_parameters:
+              catalog: ${var.catalog}
+
+      environments:
+        - environment_key: default
+          spec:
+            client: "4"
+
+#      email_notifications:
+#        on_failure:
+#          - your.email@domain.com
