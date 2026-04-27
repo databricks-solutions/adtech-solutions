@@ -1,0 +1,1182 @@
+{
+  "datasets": [
+    {
+      "name": "ucmv_data",
+      "displayName": "Campaign Reach (UCMV)",
+      "queryLines": [
+        "SELECT\n",
+        "  campaign,\n",
+        "  publisher,\n",
+        "  device_type,\n",
+        "  inventory_type,\n",
+        "  content,\n",
+        "  marketing_region,\n",
+        "  mc_indid,\n",
+        "  hhid,\n",
+        "  ip_address,\n",
+        "  server_email,\n",
+        "  imps,\n",
+        "  raw_imps_kpi\n",
+        "FROM\n",
+        "  media_advertising.gold.reach_individual"
+      ]
+    },
+    {
+      "name": "cube_detail_data",
+      "displayName": "Dimension Combinations (Detail)",
+      "queryLines": [
+        "SELECT\n",
+        "  campaign,\n",
+        "  publisher,\n",
+        "  device_type,\n",
+        "  inventory_type,\n",
+        "  content,\n",
+        "  marketing_region,\n",
+        "  reach_ind,\n",
+        "  reach_hhid,\n",
+        "  reach_ip,\n",
+        "  reach_email,\n",
+        "  matched_imps,\n",
+        "  raw_imps\n",
+        "FROM\n",
+        "  media_advertising.gold.reach_cube"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "overview",
+      "displayName": "Campaign Overview",
+      "layout": [
+        {
+          "widget": {
+            "name": "title",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## Campaign Reach Dashboard"
+              ]
+            }
+          },
+          "position": {
+            "x": 1,
+            "y": 0,
+            "width": 15,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "subtitle",
+            "multilineTextboxSpec": {
+              "lines": [
+                "COPPA-filtered, deduplicated reach metrics. Use the Campaign filter to explore any campaign."
+              ]
+            }
+          },
+          "position": {
+            "x": 1,
+            "y": 1,
+            "width": 15,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-ind-reach",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ucmv_data",
+                  "fields": [
+                    {
+                      "name": "countdistinct(mc_indid)",
+                      "expression": "COUNT(DISTINCT `mc_indid`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "countdistinct(mc_indid)",
+                  "displayName": "Individual Reach"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Individual Reach"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-hh-reach",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ucmv_data",
+                  "fields": [
+                    {
+                      "name": "countdistinct(hhid)",
+                      "expression": "COUNT(DISTINCT `hhid`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "countdistinct(hhid)",
+                  "displayName": "Household Reach"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Household Reach"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 2,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-matched-imps",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ucmv_data",
+                  "fields": [
+                    {
+                      "name": "sum(imps)",
+                      "expression": "SUM(`imps`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(imps)",
+                  "displayName": "Matched Impressions"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Matched Impressions"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 2,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-ip-reach",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ucmv_data",
+                  "fields": [
+                    {
+                      "name": "countdistinct(ip_address)",
+                      "expression": "COUNT(DISTINCT `ip_address`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "countdistinct(ip_address)",
+                  "displayName": "IP Reach"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "IP Reach"
+              }
+            }
+          },
+          "position": {
+            "x": 12,
+            "y": 2,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-email-reach",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ucmv_data",
+                  "fields": [
+                    {
+                      "name": "countdistinct(server_email)",
+                      "expression": "COUNT(DISTINCT `server_email`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "countdistinct(server_email)",
+                  "displayName": "Email Reach"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Email Reach"
+              }
+            }
+          },
+          "position": {
+            "x": 16,
+            "y": 2,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-raw-imps",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ucmv_data",
+                  "fields": [
+                    {
+                      "name": "sum(raw_imps_kpi)",
+                      "expression": "SUM(`raw_imps_kpi`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(raw_imps_kpi)",
+                  "displayName": "Raw Impressions"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Raw Impressions"
+              }
+            }
+          },
+          "position": {
+            "x": 20,
+            "y": 2,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "bar-publisher",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ucmv_data",
+                  "fields": [
+                    {
+                      "name": "publisher",
+                      "expression": "`publisher`"
+                    },
+                    {
+                      "name": "countdistinct(mc_indid)",
+                      "expression": "COUNT(DISTINCT `mc_indid`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "publisher",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  },
+                  "displayName": "Publisher"
+                },
+                "y": {
+                  "fieldName": "countdistinct(mc_indid)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Individual Reach"
+                },
+                "label": {
+                  "show": true
+                },
+                "color": {
+                  "fieldName": "publisher",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Publisher"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Reach by Publisher"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 5,
+            "width": 24,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "pie-device",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ucmv_data",
+                  "fields": [
+                    {
+                      "name": "device_type",
+                      "expression": "`device_type`"
+                    },
+                    {
+                      "name": "countdistinct(mc_indid)",
+                      "expression": "COUNT(DISTINCT `mc_indid`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "countdistinct(mc_indid)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Individual Reach"
+                },
+                "color": {
+                  "fieldName": "device_type",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Device Type"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Reach by Device Type"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 10,
+            "width": 12,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "bar-inventory",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ucmv_data",
+                  "fields": [
+                    {
+                      "name": "inventory_type",
+                      "expression": "`inventory_type`"
+                    },
+                    {
+                      "name": "countdistinct(mc_indid)",
+                      "expression": "COUNT(DISTINCT `mc_indid`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "inventory_type",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  },
+                  "displayName": "Inventory Type"
+                },
+                "y": {
+                  "fieldName": "countdistinct(mc_indid)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Individual Reach"
+                },
+                "label": {
+                  "show": true
+                },
+                "color": {
+                  "fieldName": "inventory_type",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Inventory Type"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Reach by Inventory Type"
+              }
+            }
+          },
+          "position": {
+            "x": 12,
+            "y": 10,
+            "width": 12,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "bar-content2",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ucmv_data",
+                  "fields": [
+                    {
+                      "name": "content",
+                      "expression": "`content`"
+                    },
+                    {
+                      "name": "countdistinct(mc_indid)",
+                      "expression": "COUNT(DISTINCT `mc_indid`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "countdistinct(mc_indid)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Individual Reach"
+                },
+                "y": {
+                  "fieldName": "content",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "x-reversed"
+                    }
+                  },
+                  "displayName": "Content"
+                },
+                "label": {
+                  "show": true
+                },
+                "color": {
+                  "fieldName": "content",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Content",
+                  "legend": {
+                    "hide": true
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Individual Reach by Content Title"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 48,
+            "width": 24,
+            "height": 15
+          }
+        },
+        {
+          "widget": {
+            "name": "table-region",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ucmv_data",
+                  "fields": [
+                    {
+                      "name": "marketing_region",
+                      "expression": "`marketing_region`"
+                    },
+                    {
+                      "name": "countdistinct(mc_indid)",
+                      "expression": "COUNT(DISTINCT `mc_indid`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "countdistinct(mc_indid)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Individual Reach"
+                },
+                "y": {
+                  "fieldName": "marketing_region",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "x-reversed"
+                    }
+                  },
+                  "displayName": "Marketing Region"
+                },
+                "color": {
+                  "fieldName": "marketing_region",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Marketing Region",
+                  "legend": {
+                    "hide": true
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Reach by Marketing Region"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 30,
+            "width": 24,
+            "height": 18
+          }
+        },
+        {
+          "widget": {
+            "name": "filter-campaign-p1",
+            "queries": [
+              {
+                "name": "ds_filter-campaign-p1",
+                "query": {
+                  "datasetName": "ucmv_data",
+                  "fields": [
+                    {
+                      "name": "campaign",
+                      "expression": "`campaign`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "campaign",
+                    "displayName": "Campaign",
+                    "queryName": "ds_filter-campaign-p1"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Campaign"
+              }
+            }
+          },
+          "position": {
+            "x": 16,
+            "y": 0,
+            "width": 8,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "logo-megacorp",
+            "multilineTextboxSpec": {
+              "lines": [
+                "![Megacorp Logo](data:image/png;base64,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)"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 1,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "sankey-reach-flow-cpd",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ucmv_data",
+                  "fields": [
+                    {
+                      "name": "campaign",
+                      "expression": "`campaign`"
+                    },
+                    {
+                      "name": "publisher",
+                      "expression": "`publisher`"
+                    },
+                    {
+                      "name": "device_type",
+                      "expression": "`device_type`"
+                    },
+                    {
+                      "name": "countdistinct(mc_indid)",
+                      "expression": "COUNT(DISTINCT `mc_indid`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "sankey",
+              "encodings": {
+                "stages": [
+                  {
+                    "fieldName": "campaign",
+                    "displayName": "Campaign"
+                  },
+                  {
+                    "fieldName": "publisher",
+                    "displayName": "Publisher"
+                  },
+                  {
+                    "fieldName": "device_type",
+                    "displayName": "Device Type"
+                  }
+                ],
+                "value": {
+                  "fieldName": "countdistinct(mc_indid)",
+                  "displayName": "Individual Reach"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "How Publisher Mix Shapes Device Type Reach"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 15,
+            "width": 24,
+            "height": 15
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "dim-explorer-1a21afe0",
+      "displayName": "Dimension Explorer",
+      "layout": [
+        {
+          "widget": {
+            "name": "dim-intro",
+            "multilineTextboxSpec": {
+              "lines": [
+                "Filter by publisher, device type, inventory type, content, and region to explore reach for each dimension combination."
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "filter-publisher",
+            "queries": [
+              {
+                "name": "ds_filter-publisher",
+                "query": {
+                  "datasetName": "cube_detail_data",
+                  "fields": [
+                    {
+                      "name": "publisher",
+                      "expression": "`publisher`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "publisher",
+                    "displayName": "Publisher",
+                    "queryName": "ds_filter-publisher"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Publisher"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 1,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "filter-device-type",
+            "queries": [
+              {
+                "name": "ds_filter-device-type",
+                "query": {
+                  "datasetName": "cube_detail_data",
+                  "fields": [
+                    {
+                      "name": "device_type",
+                      "expression": "`device_type`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "device_type",
+                    "displayName": "Device Type",
+                    "queryName": "ds_filter-device-type"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Device Type"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 1,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "table-dims",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "cube_detail_data",
+                  "fields": [
+                    {
+                      "name": "campaign",
+                      "expression": "`campaign`"
+                    },
+                    {
+                      "name": "publisher",
+                      "expression": "`publisher`"
+                    },
+                    {
+                      "name": "device_type",
+                      "expression": "`device_type`"
+                    },
+                    {
+                      "name": "inventory_type",
+                      "expression": "`inventory_type`"
+                    },
+                    {
+                      "name": "content",
+                      "expression": "`content`"
+                    },
+                    {
+                      "name": "marketing_region",
+                      "expression": "`marketing_region`"
+                    },
+                    {
+                      "name": "reach_ind",
+                      "expression": "`reach_ind`"
+                    },
+                    {
+                      "name": "reach_hhid",
+                      "expression": "`reach_hhid`"
+                    },
+                    {
+                      "name": "matched_imps",
+                      "expression": "`matched_imps`"
+                    },
+                    {
+                      "name": "raw_imps",
+                      "expression": "`raw_imps`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "campaign",
+                    "displayName": "Campaign"
+                  },
+                  {
+                    "fieldName": "publisher",
+                    "displayName": "Publisher"
+                  },
+                  {
+                    "fieldName": "device_type",
+                    "displayName": "Device Type"
+                  },
+                  {
+                    "fieldName": "inventory_type",
+                    "displayName": "Inventory Type"
+                  },
+                  {
+                    "fieldName": "content",
+                    "displayName": "Content"
+                  },
+                  {
+                    "fieldName": "marketing_region",
+                    "displayName": "Marketing Region"
+                  },
+                  {
+                    "fieldName": "reach_ind",
+                    "displayName": "Individual Reach"
+                  },
+                  {
+                    "fieldName": "reach_hhid",
+                    "displayName": "Household Reach"
+                  },
+                  {
+                    "fieldName": "matched_imps",
+                    "displayName": "Matched Imps"
+                  },
+                  {
+                    "fieldName": "raw_imps",
+                    "displayName": "Raw Imps"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "All Dimension Combinations"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 5,
+            "width": 12,
+            "height": 9
+          }
+        },
+        {
+          "widget": {
+            "name": "filter-inventory-type",
+            "queries": [
+              {
+                "name": "ds_filter-inventory-type",
+                "query": {
+                  "datasetName": "cube_detail_data",
+                  "fields": [
+                    {
+                      "name": "inventory_type",
+                      "expression": "`inventory_type`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "inventory_type",
+                    "displayName": "Inventory Type",
+                    "queryName": "ds_filter-inventory-type"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Inventory Type"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "filter-content",
+            "queries": [
+              {
+                "name": "ds_filter-content",
+                "query": {
+                  "datasetName": "cube_detail_data",
+                  "fields": [
+                    {
+                      "name": "content",
+                      "expression": "`content`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "content",
+                    "displayName": "Content",
+                    "queryName": "ds_filter-content"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Content"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 3,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "filter-region",
+            "queries": [
+              {
+                "name": "ds_filter-region",
+                "query": {
+                  "datasetName": "cube_detail_data",
+                  "fields": [
+                    {
+                      "name": "marketing_region",
+                      "expression": "`marketing_region`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "marketing_region",
+                    "displayName": "Marketing Region",
+                    "queryName": "ds_filter-region"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Marketing Region"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 3,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "filter-campaign-p2",
+            "queries": [
+              {
+                "name": "ds_filter-campaign-p2",
+                "query": {
+                  "datasetName": "cube_detail_data",
+                  "fields": [
+                    {
+                      "name": "campaign",
+                      "expression": "`campaign`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "campaign",
+                    "displayName": "Campaign",
+                    "queryName": "ds_filter-campaign-p2"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Campaign"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 4,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}

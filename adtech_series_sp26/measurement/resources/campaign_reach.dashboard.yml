@@ -1,0 +1,9 @@
+resources:
+  dashboards:
+    campaign_reach:
+      display_name: "AdTech Series — Campaign Reach"
+
+      file_path: ../src/dashboards/campaign_reach.lvdash.json
+
+      # SQL warehouse that executes dashboard queries.
+      warehouse_id: ${var.warehouse_id}
