@@ -1,0 +1,452 @@
+{
+  "description": "Ask questions about advertising campaign reach -- individuals, households, and impressions across publishers, content, devices, and regions.",
+  "serialized_space": {
+    "version": 2,
+    "data_sources": {
+      "tables": [
+        {
+          "identifier": "media_advertising.gold.reach_cube"
+        }
+      ],
+      "metric_views": [
+        {
+          "identifier": "media_advertising.gold.campaign_reach_metrics"
+        }
+      ]
+    },
+    "instructions": {
+      "text_instructions": [
+        {
+          "id": "ff362b5eac7240cc919f75ee3c2ddcb8",
+          "content": [
+            "Two data sources are available:\n\n1. campaign_reach_metrics (Metric View — use MEASURE() syntax)\n   Source: reach_individual (individual-level COPPA-filtered gold table).\n   Use for: any reach question at any grain — individual, household, IP, email reach;\n   matched/raw impressions. Always deduplicated via COUNT DISTINCT. Correct at any filter combination.\n   Measures: Individual Reach, Household Reach, IP Reach, Email Reach,\n             Total Matched Impressions, Total Raw Impressions\n\n2. media_advertising.gold.reach_cube (Table — use direct SQL)\n   Use for: raw vs matched impression comparisons, all dimension-combination breakdowns,\n   and pre-aggregated rollup rows. Only source for raw_imps column.\n   Columns: campaign, publisher, device_type, inventory_type, content, marketing_region,\n            reach_ind, reach_hhid, reach_ip, reach_email, matched_imps, raw_imps\n   Row types:\n   - Detail rows: all 6 dims have specific values (publisher != 'All')\n   - Rollup rows: one dim kept, rest = 'All' (e.g. publisher='Big Mountain', device_type='All')\n   - Campaign-total row: all dims = 'All' (publisher='All' AND device_type='All' AND ...)\n\nDecision rule:\n- reach question at any grain → MEASURE() on campaign_reach_metrics\n- raw impressions or matched impressions by dimension → reach_cube\n- all dimension combinations / rollup summary table → reach_cube WHERE publisher != 'All'\n- campaign-level total with rollup → reach_cube WHERE publisher='All' AND device_type='All'\n    AND inventory_type='All' AND content='All' AND marketing_region='All'\n- cross-dimensional breakdown (two or more dims simultaneously, e.g. publisher × device_type,\n  campaign × publisher, publisher × content, content × device_type) → ALWAYS use campaign_reach_metrics,\n  NOT reach_cube, even for 'what content did each publisher serve' style questions where the intent\n  is to see reach by that combination. reach_cube rollup rows only collapse ONE dimension at a time;\n  querying two non-'All' dims from reach_cube will produce incorrect results.\n\nMetric definitions:\n- Individual Reach: distinct COPPA-filtered individuals; correct at any grain (no double-counting)\n- Household Reach: distinct households\n- IP Reach: distinct IP addresses\n- Email Reach: distinct hashed email addresses\n- Total Matched Impressions: impressions surviving COPPA filter AND matched to campaign audience\n- Total Raw Impressions: all impressions before any filtering; raw >= matched always\n\n"
+          ]
+        }
+      ],
+      "example_question_sqls": [
+        {
+          "id": "0359fa05477042c2b87b618826fd58d7",
+          "question": [
+            "Which marketing region had the highest reach?"
+          ],
+          "sql": [
+            "SELECT `Marketing Region`, MEASURE(`Individual Reach`) AS reach FROM media_advertising.gold.campaign_reach_metrics WHERE `Campaign` = 'Terrific Tacos' GROUP BY ALL ORDER BY reach DESC LIMIT 1"
+          ]
+        },
+        {
+          "id": "1dd2b54eb28b4c48921b54edf7dc00d9",
+          "question": [
+            "Which publisher had the highest individual reach for Best Burgers?"
+          ],
+          "sql": [
+            "SELECT `Publisher`, MEASURE(`Individual Reach`) AS reach FROM media_advertising.gold.campaign_reach_metrics WHERE `Campaign` = 'Best Burgers' GROUP BY ALL ORDER BY reach DESC LIMIT 1"
+          ]
+        },
+        {
+          "id": "2406f0e4c83e40488aaedc91935a1433",
+          "question": [
+            "What was the total individual reach for Terrific Tacos?"
+          ],
+          "sql": [
+            "SELECT MEASURE(`Individual Reach`) AS total_reach FROM media_advertising.gold.campaign_reach_metrics WHERE `Campaign` = 'Terrific Tacos' GROUP BY ALL"
+          ]
+        },
+        {
+          "id": "28156c4311ae423a9bfa8e92acb358db",
+          "question": [
+            "Which campaign had the highest individual reach?"
+          ],
+          "sql": [
+            "SELECT `Campaign`, MEASURE(`Individual Reach`) AS reach FROM media_advertising.gold.campaign_reach_metrics GROUP BY ALL ORDER BY reach DESC LIMIT 1"
+          ]
+        },
+        {
+          "id": "31f75471da9045a68f3246fec8a9de87",
+          "question": [
+            "How does CTV reach compare to Mobile reach for Terrific Tacos?"
+          ],
+          "sql": [
+            "SELECT `Device Type`, MEASURE(`Individual Reach`) AS reach FROM media_advertising.gold.campaign_reach_metrics WHERE `Campaign` = 'Terrific Tacos' AND `Device Type` IN ('CTV', 'Mobile') GROUP BY ALL ORDER BY reach DESC"
+          ]
+        },
+        {
+          "id": "363c76f93f964e66bb1b858a45d98b47",
+          "question": [
+            "What is the overall campaign total reach and impressions for Terrific Tacos?"
+          ],
+          "sql": [
+            "SELECT reach_ind, reach_hhid, reach_ip, reach_email, matched_imps, raw_imps FROM media_advertising.gold.reach_cube WHERE campaign = 'Terrific Tacos' AND publisher = 'All' AND device_type = 'All' AND inventory_type = 'All' AND content = 'All' AND marketing_region = 'All'"
+          ]
+        },
+        {
+          "id": "495ce9d8d3bd480c871d4beac9268897",
+          "question": [
+            "What are the raw impressions vs matched impressions for Terrific Tacos by publisher?"
+          ],
+          "sql": [
+            "SELECT publisher, raw_imps, matched_imps, reach_ind FROM media_advertising.gold.reach_cube WHERE campaign = 'Terrific Tacos' AND device_type = 'All' AND inventory_type = 'All' AND content = 'All' AND marketing_region = 'All' AND publisher != 'All' ORDER BY raw_imps DESC"
+          ]
+        },
+        {
+          "id": "5a204d1e4dfb4f0aab46a2b26b22345f",
+          "question": [
+            "Compare raw vs matched impressions by device type for Terrific Tacos"
+          ],
+          "sql": [
+            "SELECT device_type, raw_imps, matched_imps, reach_ind FROM media_advertising.gold.reach_cube WHERE campaign = 'Terrific Tacos' AND publisher = 'All' AND inventory_type = 'All' AND content = 'All' AND marketing_region = 'All' AND device_type != 'All' ORDER BY raw_imps DESC"
+          ]
+        },
+        {
+          "id": "65170df511364fbc883251193eb9bcce",
+          "question": [
+            "What was the CTV reach for Terrific Tacos on Big Mountain?"
+          ],
+          "sql": [
+            "SELECT MEASURE(`Individual Reach`) AS reach FROM media_advertising.gold.campaign_reach_metrics WHERE `Campaign` = 'Terrific Tacos' AND `Publisher` = 'Big Mountain' AND `Inventory Type` = 'CTV' GROUP BY ALL"
+          ]
+        },
+        {
+          "id": "6fd39f319595469384462cb49a59d9bc",
+          "question": [
+            "What was the total individual reach for Best Burgers?"
+          ],
+          "sql": [
+            "SELECT MEASURE(`Individual Reach`) AS total_reach FROM media_advertising.gold.campaign_reach_metrics WHERE `Campaign` = 'Best Burgers' GROUP BY ALL"
+          ]
+        },
+        {
+          "id": "a039110c08254569a7c42d16bc0de876",
+          "question": [
+            "Which marketing regions had the top 5 reach for Terrific Tacos?"
+          ],
+          "sql": [
+            "SELECT `Marketing Region`, MEASURE(`Individual Reach`) AS reach FROM media_advertising.gold.campaign_reach_metrics WHERE `Campaign` = 'Terrific Tacos' GROUP BY ALL ORDER BY reach DESC LIMIT 5"
+          ]
+        },
+        {
+          "id": "b58b10b18895404aa96f4d20f72f887e",
+          "question": [
+            "What is the reach breakdown by inventory type for Terrific Tacos?"
+          ],
+          "sql": [
+            "SELECT `Inventory Type`, MEASURE(`Individual Reach`) AS reach FROM media_advertising.gold.campaign_reach_metrics WHERE `Campaign` = 'Terrific Tacos' GROUP BY ALL ORDER BY reach DESC"
+          ]
+        },
+        {
+          "id": "b819351a31a249bb8e0c2dc232b82d60",
+          "question": [
+            "Show me individual reach for all campaigns ranked."
+          ],
+          "sql": [
+            "SELECT `Campaign`, MEASURE(`Individual Reach`) AS reach FROM media_advertising.gold.campaign_reach_metrics GROUP BY ALL ORDER BY reach DESC"
+          ]
+        },
+        {
+          "id": "e14233348b5f42dfa089fd67bd84a3be",
+          "question": [
+            "Which publisher had the highest individual reach for Terrific Tacos?"
+          ],
+          "sql": [
+            "SELECT `Publisher`, MEASURE(`Individual Reach`) AS reach FROM media_advertising.gold.campaign_reach_metrics WHERE `Campaign` = 'Terrific Tacos' GROUP BY ALL ORDER BY reach DESC LIMIT 1"
+          ]
+        },
+        {
+          "id": "f178897cbcc64f698a035e9c741db683",
+          "question": [
+            "How does household reach compare to individual reach by campaign?"
+          ],
+          "sql": [
+            "SELECT `Campaign`, MEASURE(`Individual Reach`) AS reach_ind, MEASURE(`Household Reach`) AS reach_hhid FROM media_advertising.gold.campaign_reach_metrics GROUP BY ALL ORDER BY reach_ind DESC"
+          ]
+        },
+        {
+          "id": "f73fc21c53814f51a754c6edca1ec241",
+          "question": [
+            "What is the reach for Terrific Tacos across all device types by publisher?"
+          ],
+          "sql": [
+            "SELECT publisher, reach_ind, reach_hhid, matched_imps, raw_imps FROM media_advertising.gold.reach_cube WHERE campaign = 'Terrific Tacos' AND device_type = 'All' AND inventory_type = 'All' AND content = 'All' AND marketing_region = 'All' AND publisher != 'All' ORDER BY reach_ind DESC"
+          ]
+        },
+        {
+          "id": "ff15e083bb434ec7aac45bc6059e969d",
+          "question": [
+            "Show me reach by content title for Terrific Tacos."
+          ],
+          "sql": [
+            "SELECT `Content`, MEASURE(`Individual Reach`) AS reach FROM media_advertising.gold.campaign_reach_metrics WHERE `Campaign` = 'Terrific Tacos' GROUP BY ALL ORDER BY reach DESC"
+          ]
+        },
+        {
+          "id": "ffc34aacee634b208eccc561133e5879",
+          "question": [
+            "Show me all dimension combinations and their reach for Terrific Tacos"
+          ],
+          "sql": [
+            "SELECT publisher, device_type, inventory_type, content, marketing_region, reach_ind, matched_imps, raw_imps FROM media_advertising.gold.reach_cube WHERE campaign = 'Terrific Tacos' AND publisher != 'All' AND device_type != 'All' AND inventory_type != 'All' AND content != 'All' AND marketing_region != 'All' ORDER BY reach_ind DESC"
+          ]
+        }
+      ],
+      "sql_snippets": {
+        "measures": [
+          {
+            "id": "01f128c149ae1e82b13832332f3df180",
+            "alias": "individual_reach",
+            "sql": [
+              "MEASURE(`Individual Reach`) FROM media_advertising.gold.campaign_reach_metrics"
+            ],
+            "display_name": "individual reach (COUNT DISTINCT, correct at any grain)",
+            "instruction": [
+              "WHEN_TO_USE: Whenever the user asks about how many people, individuals, or reach — at any dimensional grain. SCOPE: Use campaign_reach_metrics metric view with MEASURE(`Individual Reach`). GRAIN_SAFE: The MEASURE() wrapper ensures COUNT DISTINCT is computed correctly at any GROUP BY grain without double-counting."
+            ]
+          }
+        ]
+      }
+    },
+    "benchmarks": {
+      "questions": [
+        {
+          "id": "af94e3235f014d9d92428a452d6e29f2",
+          "question": [
+            "How does household reach compare to individual reach by campaign?"
+          ],
+          "answer": [
+            {
+              "format": "SQL",
+              "content": [
+                "SELECT `Campaign`, MEASURE(`Individual Reach`) AS reach_ind, MEASURE(`Household Reach`) AS reach_hhid FROM media_advertising.gold.campaign_reach_metrics GROUP BY ALL ORDER BY reach_ind DESC"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "9538b4e117c64da3968e404f98876923",
+          "question": [
+            "What is the reach breakdown by inventory type for Terrific Tacos?"
+          ],
+          "answer": [
+            {
+              "format": "SQL",
+              "content": [
+                "SELECT `Inventory Type`, MEASURE(`Individual Reach`) AS reach FROM media_advertising.gold.campaign_reach_metrics WHERE `Campaign` = 'Terrific Tacos' GROUP BY ALL ORDER BY reach DESC"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "81a32aff1ece442c94ad51da8078b50a",
+          "question": [
+            "What was the total individual reach for Terrific Tacos?"
+          ],
+          "answer": [
+            {
+              "format": "SQL",
+              "content": [
+                "SELECT MEASURE(`Individual Reach`) AS total_reach FROM media_advertising.gold.campaign_reach_metrics WHERE `Campaign` = 'Terrific Tacos' GROUP BY ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "6895afd3808c4920bcd24abf8e250ec5",
+          "question": [
+            "Show me reach by content title for Terrific Tacos."
+          ],
+          "answer": [
+            {
+              "format": "SQL",
+              "content": [
+                "SELECT `Content`, MEASURE(`Individual Reach`) AS reach FROM media_advertising.gold.campaign_reach_metrics WHERE `Campaign` = 'Terrific Tacos' GROUP BY ALL ORDER BY reach DESC"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "65011a5f9e99404da102c81fe86d4f0c",
+          "question": [
+            "Which marketing regions had the top 5 reach for Terrific Tacos?"
+          ],
+          "answer": [
+            {
+              "format": "SQL",
+              "content": [
+                "SELECT `Marketing Region`, MEASURE(`Individual Reach`) AS reach FROM media_advertising.gold.campaign_reach_metrics WHERE `Campaign` = 'Terrific Tacos' GROUP BY ALL ORDER BY reach DESC LIMIT 5"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "41e35d859eaf43cd977c8bd0df7e17bc",
+          "question": [
+            "How does CTV reach compare to Mobile reach for Terrific Tacos?"
+          ],
+          "answer": [
+            {
+              "format": "SQL",
+              "content": [
+                "SELECT `Device Type`, MEASURE(`Individual Reach`) AS reach FROM media_advertising.gold.campaign_reach_metrics WHERE `Campaign` = 'Terrific Tacos' AND `Device Type` IN ('CTV', 'Mobile') GROUP BY ALL ORDER BY reach DESC"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "4178c40cef7f45a19851e28b25277870",
+          "question": [
+            "Show me individual reach for all campaigns ranked."
+          ],
+          "answer": [
+            {
+              "format": "SQL",
+              "content": [
+                "SELECT `Campaign`, MEASURE(`Individual Reach`) AS reach FROM media_advertising.gold.campaign_reach_metrics GROUP BY ALL ORDER BY reach DESC"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "3f3d9906382a43a894ef572c5ce156ca",
+          "question": [
+            "Which marketing region had the highest reach for Terrific Tacos?"
+          ],
+          "answer": [
+            {
+              "format": "SQL",
+              "content": [
+                "SELECT `Marketing Region`, MEASURE(`Individual Reach`) AS reach FROM media_advertising.gold.campaign_reach_metrics WHERE `Campaign` = 'Terrific Tacos' GROUP BY ALL ORDER BY reach DESC LIMIT 1"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "29e482774a4d41f28a1805e6257ed4dd",
+          "question": [
+            "Which publisher had the highest individual reach for Terrific Tacos?"
+          ],
+          "answer": [
+            {
+              "format": "SQL",
+              "content": [
+                "SELECT `Publisher`, MEASURE(`Individual Reach`) AS reach FROM media_advertising.gold.campaign_reach_metrics WHERE `Campaign` = 'Terrific Tacos' GROUP BY ALL ORDER BY reach DESC LIMIT 1"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "17270b2041be4dba85c6721a4d27907e",
+          "question": [
+            "Which campaign had the highest individual reach?"
+          ],
+          "answer": [
+            {
+              "format": "SQL",
+              "content": [
+                "SELECT `Campaign`, MEASURE(`Individual Reach`) AS reach FROM media_advertising.gold.campaign_reach_metrics GROUP BY ALL ORDER BY reach DESC LIMIT 1"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ffc6cdb8f8e44abba2735273dc65eca1",
+          "question": [
+            "What is the overall campaign total reach and impressions for Terrific Tacos?"
+          ],
+          "answer": [
+            {
+              "format": "SQL",
+              "content": [
+                "SELECT reach_ind, reach_hhid, reach_ip, reach_email, matched_imps, raw_imps FROM media_advertising.gold.reach_cube WHERE campaign = 'Terrific Tacos' AND publisher = 'All' AND device_type = 'All' AND inventory_type = 'All' AND content = 'All' AND marketing_region = 'All'"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ce525e26c62d43318a0f7ce6bfab5d50",
+          "question": [
+            "What are the raw impressions vs matched impressions for Terrific Tacos by publisher?"
+          ],
+          "answer": [
+            {
+              "format": "SQL",
+              "content": [
+                "SELECT publisher, raw_imps, matched_imps, reach_ind FROM media_advertising.gold.reach_cube WHERE campaign = 'Terrific Tacos' AND device_type = 'All' AND inventory_type = 'All' AND content = 'All' AND marketing_region = 'All' AND publisher != 'All' ORDER BY raw_imps DESC"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ca9f4bb6c613491284e147733d7f57dd",
+          "question": [
+            "Compare raw vs matched impressions by device type for Terrific Tacos"
+          ],
+          "answer": [
+            {
+              "format": "SQL",
+              "content": [
+                "SELECT device_type, raw_imps, matched_imps, reach_ind FROM media_advertising.gold.reach_cube WHERE campaign = 'Terrific Tacos' AND publisher = 'All' AND inventory_type = 'All' AND content = 'All' AND marketing_region = 'All' AND device_type != 'All' ORDER BY raw_imps DESC"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "20892ed9b51b47ca8f9630633274ce4b",
+          "question": [
+            "What are the raw impressions vs matched impressions for each campaign?"
+          ],
+          "answer": [
+            {
+              "format": "SQL",
+              "content": [
+                "SELECT campaign, raw_imps, matched_imps, reach_ind FROM media_advertising.gold.reach_cube WHERE publisher = 'All' AND device_type = 'All' AND inventory_type = 'All' AND content = 'All' AND marketing_region = 'All' AND campaign != 'All' ORDER BY raw_imps DESC"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "75ca555833a445b6a4e2ea97c014d7a0",
+          "question": [
+            "What are the raw impressions vs matched impressions for Terrific Tacos by marketing region?"
+          ],
+          "answer": [
+            {
+              "format": "SQL",
+              "content": [
+                "SELECT marketing_region, raw_imps, matched_imps, reach_ind FROM media_advertising.gold.reach_cube WHERE campaign = 'Terrific Tacos' AND publisher = 'All' AND device_type = 'All' AND inventory_type = 'All' AND content = 'All' AND marketing_region != 'All' ORDER BY raw_imps DESC"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "c32b43d7e24041788aee02dfa3a3a517",
+          "question": [
+            "Show me device type breakdown by publisher"
+          ],
+          "answer": [
+            {
+              "format": "SQL",
+              "content": [
+                "SELECT `Publisher`, `Device Type`, MEASURE(`Individual Reach`) AS reach_ind FROM media_advertising.gold.campaign_reach_metrics GROUP BY ALL ORDER BY `Publisher`, reach_ind DESC"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "70ce72fba8b6436b92a49418f399e4f0",
+          "question": [
+            "Which publishers drove the most CTV reach for Moving Movie?"
+          ],
+          "answer": [
+            {
+              "format": "SQL",
+              "content": [
+                "SELECT `Publisher`, MEASURE(`Individual Reach`) AS reach_ind FROM media_advertising.gold.campaign_reach_metrics WHERE `Campaign` = 'Moving Movie' AND `Device Type` = 'CTV' GROUP BY ALL ORDER BY reach_ind DESC"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "space_id": null,
+  "title": "AdTech Series — Campaign Reach Q&A",
+  "warehouse_id": null
+}

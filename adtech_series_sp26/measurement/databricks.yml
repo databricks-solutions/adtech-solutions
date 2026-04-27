@@ -1,0 +1,39 @@
+bundle:
+  name: adtech-measurement-pipeline
+
+variables:
+  catalog:
+    description: "Unity Catalog catalog for all pipeline outputs"
+    default: media_advertising
+  source_catalog:
+    description: "Catalog containing source impression logs"
+    default: media_advertising
+  source_schema:
+    description: "Schema containing source impression logs"
+    default: bronze
+  source_table:
+    description: "Source impression logs table name"
+    default: impression_logs_prod
+  campaigns_catalog:
+    description: "Catalog containing campaign audience table"
+    default: media_advertising
+  campaigns_schema:
+    description: "Schema containing campaign audience table"
+    default: segments
+  campaigns_table:
+    description: "Campaign audience table name"
+    default: megacorp_campaigns
+  warehouse_id:
+    description: "SQL warehouse ID for dashboard query execution (override via --var warehouse_id=<id>)"
+
+targets:
+  dev:
+    mode: development
+    default: true
+
+  prod:
+    mode: production
+
+
+include:
+  - resources/*.yml

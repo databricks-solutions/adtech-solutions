@@ -1,0 +1,29 @@
+resources:
+  pipelines:
+    reach_pipeline:
+      name: "AdTech Reach Measurement Pipeline"
+
+      # Target catalog and schema — all new tables land here.
+      # DO NOT change: all existing tables in media_advertising.gold must not be overwritten.
+      catalog: ${var.catalog}
+      schema: gold
+
+      # Serverless compute — required for Unity Catalog Metric Views (DBR 17.2+).
+      serverless: true
+
+      root_path: ../src/reach_pipeline
+
+      libraries:
+        - file:
+            path: ../src/reach_pipeline/transformations/reach_pipeline.py
+
+      # Pipeline parameters — accessed in Python via spark.conf.get("key").
+      # Changing source_catalog/source_schema/source_table here updates the
+      # entire pipeline without touching transformation code.
+      configuration:
+        source_catalog: ${var.source_catalog}
+        source_schema: ${var.source_schema}
+        source_table: ${var.source_table}
+        campaigns_catalog: ${var.campaigns_catalog}
+        campaigns_schema: ${var.campaigns_schema}
+        campaigns_table: ${var.campaigns_table}
