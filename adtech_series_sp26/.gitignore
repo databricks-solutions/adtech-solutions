@@ -10,6 +10,7 @@ __pycache__/
 # Node
 node_modules/
 dist/
+!**/campaign_pacing_app/frontend/dist/
 
 # Databricks
 .databricks/
