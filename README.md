@@ -7,7 +7,7 @@ Welcome to the Databricks for AdTech Solutions repository — a comprehensive co
 
 For detailed architecture information, see the individual component READMEs:
 - [Clade Code Memory File](./adtech_series/app_lakebase/CLAUDE.md)
-- [Policy Framework](./knowledge_assistant_policies/README.md)
+- [Policy Framework](./adtech_series/agents/knowledge_assistant_policies/README.md)
 - [Genie Instructions](adtech_series/aibi_genie/GENIE.md)
 
 ## Repository Structure
@@ -26,7 +26,7 @@ An AI chatbot built with Dash that features:
 - Pre-built AIBI Genie dashboard for campaign analysis
 - Metric views and KPI definitions for business intelligence
 
-### Policy Governance (`knowledge_assistant_policies/`)
+### Policy Governance (`adtech_series/agents/knowledge_assistant_policies/`)
 - Comprehensive policy pack with 20 AdTech compliance documents
 - Knowledge Assistant integration for real-time policy validation
 - Coverage of privacy, brand guidelines, legal compliance, and data governance
@@ -66,7 +66,7 @@ An AI chatbot built with Dash that features:
 
 ### Policy & Compliance Framework
 
-The [`knowledge_assistant_policies`](./knowledge_assistant_policies) directory contains 20 comprehensive policy documents covering:
+The [`adtech_series/agents/knowledge_assistant_policies`](./adtech_series/agents/knowledge_assistant_policies) directory contains 20 comprehensive policy documents covering:
 - Data governance and privacy protection
 - Brand voice and creative guidelines
 - Regional compliance and legal requirements
@@ -109,7 +109,7 @@ Phase 3: Dashboard & Genie   → Phase 4: Chat Application
 
 #### Phase 2: Knowledge Assistant Creation
 1. Create Knowledge Assistant using Agent Bricks
-2. Upload policy documents from knowledge_assistant_policies/ into a Unity Catalog Volume
+2. Upload policy documents from `adtech_series/agents/knowledge_assistant_policies/` into a Unity Catalog Volume
 3. Create & Deploy a knowledge assistant AI Brick in Agent Bricks
 4. Update `adtech_series/app_lakebase/resources/agent.job.yml with your agent endpoint.
 
