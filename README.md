@@ -3,35 +3,35 @@
 Welcome to the Databricks for AdTech Solutions repository — a comprehensive collection of AdTech solutions, including a sophisticated AI-powered chat application with multi-agent capabilities, data analysis tools, and policy governance frameworks.
 
 ### Architecture Diagrams
-![Architecture Diagram](adtech_series/app_lakebase/docs/arch.png)
+![Architecture Diagram](adtech_series_fa25/app_lakebase/docs/arch.png)
 
 For detailed architecture information, see the individual component READMEs:
-- [Clade Code Memory File](./adtech_series/app_lakebase/CLAUDE.md)
-- [Policy Framework](./adtech_series/agents/knowledge_assistant_policies/README.md)
-- [Genie Instructions](adtech_series/aibi_genie/GENIE.md)
+- [Clade Code Memory File](./adtech_series_fa25/app_lakebase/CLAUDE.md)
+- [Policy Framework](./adtech_series_fa25/agents/knowledge_assistant_policies/README.md)
+- [Genie Instructions](adtech_series_fa25/aibi_genie/GENIE.md)
 
 ## Repository Structure
 
 This repository contains four main components that work together to create a complete AdTech AI solution:
 
-### AI Chat Application (`adtech_series/app_lakebase/`)
+### AI Chat Application (`adtech_series_fa25/app_lakebase/`)
 An AI chatbot built with Dash that features:
 - Multi-agent architecture with specialized agents for data analysis and policy compliance
 - Persistent chat history with PostgreSQL + pgvector for semantic search
 - Integration with Databricks Genie and Knowledge Assistant agents
 - Real-time streaming responses and conversation management
 
-### Data & Analytics (`adtech_series/shared/megacorp_data/` + Dashboard)
+### Data & Analytics (`adtech_series_fa25/shared/megacorp_data/` + Dashboard)
 - Sample datasets for marketing campaigns, audience profiles, and segment definitions
 - Pre-built AIBI Genie dashboard for campaign analysis
 - Metric views and KPI definitions for business intelligence
 
-### Policy Governance (`adtech_series/agents/knowledge_assistant_policies/`)
+### Policy Governance (`adtech_series_fa25/agents/knowledge_assistant_policies/`)
 - Comprehensive policy pack with 20 AdTech compliance documents
 - Knowledge Assistant integration for real-time policy validation
 - Coverage of privacy, brand guidelines, legal compliance, and data governance
 
-### AI Agents (`adtech_series/app_lakebase/agents/`)
+### AI Agents (`adtech_series_fa25/app_lakebase/agents/`)
 - Custom multi-agent system with Genie, General Assistant, and Marketing Policy agents
 - Knowledge Assistant powered by Databricks Agent Bricks
 - Advanced conversation handling with context-aware responses
@@ -40,14 +40,14 @@ An AI chatbot built with Dash that features:
 
 ### Marketing Data & Analytics
 
-#### Data Sources (`adtech_series/shared/megacorp_data/`)
+#### Data Sources (`adtech_series_fa25/shared/megacorp_data/`)
 - **`megacorp_campaigns.parquet`** - Marketing campaign data linking individuals to campaigns
 - **`megacorp_audience_census_profile.parquet`** - Demographic and behavioral profiles (age, gender, location, pet ownership)
 - **`megacorp_segment_definitions.parquet`** - Marketing segment definitions and descriptions
 - **`megacorp_audience_census_profile_metric_view.json`** - Business KPI metric definitions
 
 #### AIBI Dashboard
-- **`adtech_series/aibi_genie/MegaCorp Campaigns AIBI Demo.lvdash.json`** - Pre-built Lakeview dashboard for campaign analysis
+- **`adtech_series_fa25/aibi_genie/MegaCorp Campaigns AIBI Demo.lvdash.json`** - Pre-built Lakeview dashboard for campaign analysis
 - Interactive widgets for segment analysis, demographic breakdowns, and match funnels
 - Integration with Genie Space for natural language querying
 
@@ -66,7 +66,7 @@ An AI chatbot built with Dash that features:
 
 ### Policy & Compliance Framework
 
-The [`adtech_series/agents/knowledge_assistant_policies`](./adtech_series/agents/knowledge_assistant_policies) directory contains 20 comprehensive policy documents covering:
+The [`adtech_series_fa25/agents/knowledge_assistant_policies`](./adtech_series_fa25/agents/knowledge_assistant_policies) directory contains 20 comprehensive policy documents covering:
 - Data governance and privacy protection
 - Brand voice and creative guidelines
 - Regional compliance and legal requirements
@@ -104,25 +104,25 @@ Phase 3: Dashboard & Genie   → Phase 4: Chat Application
 
 #### Phase 1: Data Foundation
 1. Import datasets into Databricks
-2. Upload parquet files from `adtech_series/shared/megacorp_data/` to Unity Catalog
+2. Upload parquet files from `adtech_series_fa25/shared/megacorp_data/` to Unity Catalog
 3. Configure tables: megacorp_campaigns, megacorp_audience_census_profile, megacorp_segment_definitions
 
 #### Phase 2: Knowledge Assistant Creation
 1. Create Knowledge Assistant using Agent Bricks
-2. Upload policy documents from `adtech_series/agents/knowledge_assistant_policies/` into a Unity Catalog Volume
+2. Upload policy documents from `adtech_series_fa25/agents/knowledge_assistant_policies/` into a Unity Catalog Volume
 3. Create & Deploy a knowledge assistant AI Brick in Agent Bricks
-4. Update `adtech_series/app_lakebase/resources/agent.job.yml with your agent endpoint.
+4. Update `adtech_series_fa25/app_lakebase/resources/agent.job.yml with your agent endpoint.
 
 #### Phase 3: Dashboard & Genie Space
-1. Import `adtech_series/aibi_genie/MegaCorp Campaigns AIBI Demo.lvdash.json`
+1. Import `adtech_series_fa25/aibi_genie/MegaCorp Campaigns AIBI Demo.lvdash.json`
 2. Update Dashboard to point your imported tables
-3. Generate an [embedded dashboard](https://docs.databricks.com/aws/en/dashboards/embedding/) and copy the URI to the environment variable `DASHBOARD_IFRAME` in [app.yml](adtech_series/app_lakebase/app/app.yml)
-4. Create Genie Space connected to your data, look at [GENIE.md](adtech_series/aibi_genie/GENIE.md) for instructions.
-5. Update `genie_space_id` in the [agent deployment job](adtech_series/app_lakebase/resources/agent.job.yml).
+3. Generate an [embedded dashboard](https://docs.databricks.com/aws/en/dashboards/embedding/) and copy the URI to the environment variable `DASHBOARD_IFRAME` in [app.yml](adtech_series_fa25/app_lakebase/app/app.yml)
+4. Create Genie Space connected to your data, look at [GENIE.md](adtech_series_fa25/aibi_genie/GENIE.md) for instructions.
+5. Update `genie_space_id` in the [agent deployment job](adtech_series_fa25/app_lakebase/resources/agent.job.yml).
 
 #### Phase 4: Chat Application & Multi-Agent Deployment
 ```bash
-cd adtech_series/app_lakebase/
+cd adtech_series_fa25/app_lakebase/
 
 # Complete end to end deployment of the agent and application
 just full-deploy-agent
@@ -154,9 +154,9 @@ After deployment, verify each component:
 
 Key configuration files to customize:
 
-- `adtech_series/app_lakebase/databricks.yml` - Workspace and bundle configuration
-- `adtech_series/app_lakebase/app/app.yml` - Application environment variables
-- `adtech_series/app_lakebase/terraform/terraform.tfvars` - Infrastructure variables
+- `adtech_series_fa25/app_lakebase/databricks.yml` - Workspace and bundle configuration
+- `adtech_series_fa25/app_lakebase/app/app.yml` - Application environment variables
+- `adtech_series_fa25/app_lakebase/terraform/terraform.tfvars` - Infrastructure variables
 
 ### Common Deployment Issues
 
@@ -178,7 +178,7 @@ Key configuration files to customize:
 
 ### Local Development
 ```bash
-cd adtech_series/app_lakebase/
+cd adtech_series_fa25/app_lakebase/
 just venv          # Set up development environment
 just run           # Run application locally
 ```
