@@ -8,7 +8,7 @@ Welcome to the Databricks for AdTech Solutions repository — a comprehensive co
 For detailed architecture information, see the individual component READMEs:
 - [Clade Code Memory File](./adtech_series/app_lakebase/CLAUDE.md)
 - [Policy Framework](./knowledge_assistant_policies/README.md)
-- [Genie Instructions](GENIE.md)
+- [Genie Instructions](adtech_series/aibi_genie/GENIE.md)
 
 ## Repository Structure
 
@@ -47,7 +47,7 @@ An AI chatbot built with Dash that features:
 - **`megacorp_audience_census_profile_metric_view.json`** - Business KPI metric definitions
 
 #### AIBI Dashboard
-- **`MegaCorp Campaigns AIBI Demo.lvdash.json`** - Pre-built Lakeview dashboard for campaign analysis
+- **`adtech_series/aibi_genie/MegaCorp Campaigns AIBI Demo.lvdash.json`** - Pre-built Lakeview dashboard for campaign analysis
 - Interactive widgets for segment analysis, demographic breakdowns, and match funnels
 - Integration with Genie Space for natural language querying
 
@@ -114,10 +114,10 @@ Phase 3: Dashboard & Genie   → Phase 4: Chat Application
 4. Update `adtech_series/app_lakebase/resources/agent.job.yml with your agent endpoint.
 
 #### Phase 3: Dashboard & Genie Space
-1. Import MegaCorp Campaigns AIBI Demo.lvdash.json
+1. Import `adtech_series/aibi_genie/MegaCorp Campaigns AIBI Demo.lvdash.json`
 2. Update Dashboard to point your imported tables
 3. Generate an [embedded dashboard](https://docs.databricks.com/aws/en/dashboards/embedding/) and copy the URI to the environment variable `DASHBOARD_IFRAME` in [app.yml](adtech_series/app_lakebase/app/app.yml)
-4. Create Genie Space connected to your data, look at [GENIE.md](GENIE.md) for instructions.
+4. Create Genie Space connected to your data, look at [GENIE.md](adtech_series/aibi_genie/GENIE.md) for instructions.
 5. Update `genie_space_id` in the [agent deployment job](adtech_series/app_lakebase/resources/agent.job.yml).
 
 #### Phase 4: Chat Application & Multi-Agent Deployment
