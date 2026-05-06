@@ -21,7 +21,7 @@ An AI chatbot built with Dash that features:
 - Integration with Databricks Genie and Knowledge Assistant agents
 - Real-time streaming responses and conversation management
 
-### Data & Analytics (`megacorp_data/` + Dashboard)
+### Data & Analytics (`adtech_series/shared/megacorp_data/` + Dashboard)
 - Sample datasets for marketing campaigns, audience profiles, and segment definitions
 - Pre-built AIBI Genie dashboard for campaign analysis
 - Metric views and KPI definitions for business intelligence
@@ -40,7 +40,7 @@ An AI chatbot built with Dash that features:
 
 ### Marketing Data & Analytics
 
-#### Data Sources (`megacorp_data/`)
+#### Data Sources (`adtech_series/shared/megacorp_data/`)
 - **`megacorp_campaigns.parquet`** - Marketing campaign data linking individuals to campaigns
 - **`megacorp_audience_census_profile.parquet`** - Demographic and behavioral profiles (age, gender, location, pet ownership)
 - **`megacorp_segment_definitions.parquet`** - Marketing segment definitions and descriptions
@@ -104,7 +104,7 @@ Phase 3: Dashboard & Genie   → Phase 4: Chat Application
 
 #### Phase 1: Data Foundation
 1. Import datasets into Databricks
-2. Upload parquet files from megacorp_data/ to Unity Catalog
+2. Upload parquet files from `adtech_series/shared/megacorp_data/` to Unity Catalog
 3. Configure tables: megacorp_campaigns, megacorp_audience_census_profile, megacorp_segment_definitions
 
 #### Phase 2: Knowledge Assistant Creation

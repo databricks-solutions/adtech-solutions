@@ -64,7 +64,7 @@ These policies are designed to work with:
 ## 🔗 Related Resources
 
 This policy pack complements the existing AdTech solution assets:
-- Sample datasets in `megacorp_data/` folder
+- Sample datasets in `../../shared/megacorp_data/` folder
 - Metric view definitions for business KPIs
 - Campaign analysis and audience segmentation tools
 
