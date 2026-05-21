@@ -65,8 +65,13 @@ adtech_series_sp26/
 │   │   ├── src/                        # FastAPI backend
 │   │   └── frontend/                   # React + Tailwind dashboard
 │   └── scripts/deploy.sh
+├── segment_builder/                    # Session 1 — Audience Segmentation app (FastAPI + React)
+│   ├── app.yaml                          # Databricks App config
+│   ├── backend/                          # FastAPI: routers, services, models, config
+│   ├── frontend/                         # React + Vite + Tailwind (Agent + Builder modes)
+│   ├── docs/DATA_DICTIONARY.md
+│   └── tests/                            # Playwright app spec
 ├── identity_graph/                     # (Session 2 — placeholder)
-├── segment_builder/                    # (Session 1 — placeholder)
 └── measurement/                        # (Session 4 — placeholder)
 ```
 
