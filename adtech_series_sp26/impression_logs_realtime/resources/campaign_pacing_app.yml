@@ -12,6 +12,11 @@ resources:
             database_name: "databricks_postgres"
             instance_name: ${resources.database_instances.campaign_pacing_instance.name}
             permission: "CAN_CONNECT_AND_CREATE"
+        - name: "campaign-pacing-warehouse"
+          description: "SQL warehouse for joining segment definitions from Delta"
+          sql_warehouse:
+            id: e9b34f7a2e4b0561
+            permission: "CAN_USE"
 
       permissions:
         - level: CAN_USE

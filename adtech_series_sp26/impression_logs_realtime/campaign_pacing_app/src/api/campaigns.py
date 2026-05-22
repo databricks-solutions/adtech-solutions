@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from ..core.db import get_db
+from ..core.definitions import get_definitions
 from ..models import CampaignPacing
 from ..seed import DEMO_CAMPAIGNS
 
@@ -21,6 +22,7 @@ class CampaignResponse(BaseModel):
     pacing_pct: float
     status: Literal["ACTIVE", "PACING_FAST", "STOPPED"]
     last_updated: datetime | None
+    segment_definition: str | None = None
 
 
 def _compute_status(pacing_pct: float) -> Literal["ACTIVE", "PACING_FAST", "STOPPED"]:
@@ -38,6 +40,7 @@ def get_campaigns(db: Session = Depends(get_db)) -> list[CampaignResponse]:
     Sorted by pacing_pct descending (most at-risk on top).
     """
     rows = db.query(CampaignPacing).all()
+    definitions = get_definitions()
     results: list[CampaignResponse] = []
 
     for row in rows:
@@ -64,6 +67,7 @@ def get_campaigns(db: Session = Depends(get_db)) -> list[CampaignResponse]:
                 pacing_pct=pacing_pct,
                 status=_compute_status(pacing_pct),
                 last_updated=last_updated,
+                segment_definition=definitions.get(row.campaign_name),
             )
         )
 
