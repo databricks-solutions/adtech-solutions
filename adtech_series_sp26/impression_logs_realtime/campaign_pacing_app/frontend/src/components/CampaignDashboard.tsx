@@ -139,7 +139,13 @@ function CampaignCard({ c }: { c: Campaign }) {
   );
 }
 
-export default function CampaignDashboard() {
+interface CampaignDashboardProps {
+  onNavigateToArchitecture?: () => void;
+}
+
+export default function CampaignDashboard({
+  onNavigateToArchitecture,
+}: CampaignDashboardProps = {}) {
   const queryClient = useQueryClient();
   const [resetting, setResetting] = useState(false);
 
@@ -200,6 +206,21 @@ export default function CampaignDashboard() {
           to surface pacing decisions within ~2 seconds of an impression
           being served — fast enough to pause an over-pacing campaign before
           the money is wasted, instead of finding out hours later.
+        </p>
+        <p className="mt-2">
+          To learn more about what's going on under the hood, visit the{" "}
+          {onNavigateToArchitecture ? (
+            <button
+              type="button"
+              onClick={onNavigateToArchitecture}
+              className="font-medium text-databricks-lava-600 hover:text-databricks-lava-700 hover:underline focus:outline-none focus-visible:underline"
+            >
+              Architecture page
+            </button>
+          ) : (
+            <span className="font-medium">Architecture page</span>
+          )}
+          .
         </p>
       </div>
 

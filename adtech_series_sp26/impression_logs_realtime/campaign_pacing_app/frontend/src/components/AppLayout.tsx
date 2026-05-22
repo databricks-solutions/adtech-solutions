@@ -34,7 +34,9 @@ export const AppLayout: React.FC = () => {
               </PageHeader>
               <div className="flex-1 overflow-auto">
                 <div className="mx-auto max-w-5xl px-6 py-6">
-                  <CampaignDashboard />
+                  <CampaignDashboard
+                    onNavigateToArchitecture={() => setPage("architecture")}
+                  />
                 </div>
               </div>
             </>
