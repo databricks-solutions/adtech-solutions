@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Claude Code
+.claude/
+.databricks/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.development
+.env.test
+.env.production
+
+# Build outputs
+dist/
+build/
+
+# Playwright
+playwright-report/
+test-results/
+playwright/.cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dev docs (local only)
+dev/
+
+# Screenshots folder (development artifacts)
+screenshots/
+
+# Legacy scripts
+explore_data.py
+
+# Bun lock file (Databricks Apps uses npm)
+bun.lock
