@@ -13,3 +13,5 @@ env:
     value: databricks_postgres
   - name: LAKEBASE_INSTANCE
     value: campaign-pacing
+  - name: DATABRICKS_WAREHOUSE_ID
+    valueFrom: campaign-pacing-warehouse

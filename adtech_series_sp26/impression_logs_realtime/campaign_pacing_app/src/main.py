@@ -47,7 +47,11 @@ if os.path.isdir(_ASSETS_DIR):
 
 @app.get("/{full_path:path}", include_in_schema=False, response_model=None)
 async def serve_spa(full_path: str):
-    """SPA fallback — serve index.html for all non-API routes."""
+    """Serve static files from dist if they exist (favicon, logos, etc.), else SPA fallback."""
+    if full_path:
+        candidate = os.path.normpath(os.path.join(_FRONTEND_DIST, full_path))
+        if candidate.startswith(_FRONTEND_DIST) and os.path.isfile(candidate):
+            return FileResponse(candidate)
     index = os.path.join(_FRONTEND_DIST, "index.html")
     if os.path.isfile(index):
         return FileResponse(index)
